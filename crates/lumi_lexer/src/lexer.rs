@@ -40,6 +40,16 @@ impl Lexer {
             self.update_positions(start_line, start_col);
         }
 
+        if tokens.is_empty() || !matches!(tokens.last().unwrap().kind, TokenKind::Eof) {
+            tokens.push(Token::with_positions(
+                TokenKind::Eof,
+                self.line,
+                self.column,
+                self.line,
+                self.column,
+            ));
+        }
+
         Ok(tokens)
     }
 
@@ -92,6 +102,7 @@ impl Lexer {
 
         while self.pos < self.source.len() {
             let c = self.source[self.pos];
+            // TODO: Support Unicode identifiers
             if c.is_alphanumeric() || c.is_alphabetic() || !c.is_ascii() {
                 identifier.push(c);
                 self.advance();
@@ -353,16 +364,16 @@ impl Lexer {
                     self.advance();
                     return Ok(TokenKind::GreaterThanEqual);
                 }
-                // "++" => {
-                //     self.advance();
-                //     self.advance();
-                //     return Ok(TokenKind::Increment);
-                // }
-                // "--" => {
-                //     self.advance();
-                //     self.advance();
-                //     return Ok(TokenKind::Decrement);
-                // }
+                "++" => {
+                    self.advance();
+                    self.advance();
+                    return Ok(TokenKind::Increment);
+                }
+                "--" => {
+                    self.advance();
+                    self.advance();
+                    return Ok(TokenKind::Decrement);
+                }
                 // "&&" => {
                 //     self.advance();
                 //     self.advance();
