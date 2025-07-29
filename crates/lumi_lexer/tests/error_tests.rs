@@ -19,7 +19,7 @@ fn test_unterminated_comment() {
 
     assert!(result.is_err());
     match result.unwrap_err() {
-        LexError::UnterminatedComment => {},
-        _ => panic!("Expected unterminatedComment error")
+        LexError::UnterminatedComment => {}
+        _ => panic!("Expected unterminatedComment error"),
     }
 }

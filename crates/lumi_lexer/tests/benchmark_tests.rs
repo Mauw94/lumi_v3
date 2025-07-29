@@ -56,7 +56,11 @@ fn test_lexer_performance_large_source() {
     let tokens = tokenize(&source).unwrap();
     let duration = start.elapsed();
 
-    println!("Large source lexing took: {:?} for {} tokens", duration, tokens.len());
+    println!(
+        "Large source lexing took: {:?} for {} tokens",
+        duration,
+        tokens.len()
+    );
 
     // Should have many tokens
     assert!(tokens.len() > 3000);
@@ -73,7 +77,10 @@ fn test_lexer_memory_usage() {
     let token_count = tokens.len();
     let estimated_memory = token_count * std::mem::size_of::<lumi_lexer::Token>();
 
-    println!("Estimated memory usage: {} bytes for {} tokens", estimated_memory, token_count);
+    println!(
+        "Estimated memory usage: {} bytes for {} tokens",
+        estimated_memory, token_count
+    );
 
     // Should be reasonable memory usage (less than 1MB for small source)
     assert!(estimated_memory < 1_000_000);

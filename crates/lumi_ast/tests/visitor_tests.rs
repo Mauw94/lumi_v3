@@ -1,4 +1,7 @@
-use lumi_ast::{create_binary_expression, create_identifier, create_program, create_variable_declaration, Node, Visitor};
+use lumi_ast::{
+    create_binary_expression, create_identifier, create_program, create_variable_declaration, Node,
+    Visitor,
+};
 
 #[derive(Debug)]
 struct IdentifierCollector {
@@ -16,28 +19,26 @@ impl IdentifierCollector {
 impl Visitor for IdentifierCollector {
     type Output = ();
 
-     fn visit_node(&mut self, node: &Node) -> Self::Output {
+    fn visit_node(&mut self, node: &Node) -> Self::Output {
         match node {
             Node::Program(program) => {
-                        for node in &program.body {
-                            self.visit_node(node);
-                        }
-                    }
-            Node::VariableDeclaration(decl) => {
-                        for var_decl in &decl.declarations {
-                            self.visit_node(&var_decl.id);
-                            if let Some(init) = &var_decl.init {
-                                self.visit_node(init);
-                            }
-                        }
-                    },
-            Node::BinaryExpression(expr) => {
-                        self.visit_node(&expr.left);
-                        self.visit_node(&expr.right);
-                    },
-            Node::Identifier(id) => {
-                self.visit_identifier(id)
+                for node in &program.body {
+                    self.visit_node(node);
+                }
             }
+            Node::VariableDeclaration(decl) => {
+                for var_decl in &decl.declarations {
+                    self.visit_node(&var_decl.id);
+                    if let Some(init) = &var_decl.init {
+                        self.visit_node(init);
+                    }
+                }
+            }
+            Node::BinaryExpression(expr) => {
+                self.visit_node(&expr.left);
+                self.visit_node(&expr.right);
+            }
+            Node::Identifier(id) => self.visit_identifier(id),
             _ => {}
         }
     }
@@ -53,10 +54,7 @@ fn test_identifier_collector_visitor() {
 
     let ast = create_program(vec![
         create_variable_declaration("let", "x", Some(create_identifier("y"))),
-        create_binary_expression(
-            create_identifier("a"), 
-            "+", 
-            create_identifier("b"))
+        create_binary_expression(create_identifier("a"), "+", create_identifier("b")),
     ]);
 
     collector.visit_node(&ast);

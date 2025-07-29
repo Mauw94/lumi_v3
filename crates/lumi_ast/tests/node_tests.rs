@@ -1,5 +1,6 @@
 use lumi_ast::{
-    create_binary_expression, create_identifier, create_multiple_variable_declarations, create_number, create_string, create_variable_declaration, Node, Position, Span
+    create_binary_expression, create_identifier, create_multiple_variable_declarations,
+    create_number, create_string, create_variable_declaration, Node, Position, Span,
 };
 
 #[test]
@@ -51,7 +52,15 @@ fn test_declaration_nodes() {
 
     assert!(matches!(declaration, Node::VariableDeclaration(decl) if decl.kind == "let"));
 
-    let multiple_declarations = create_multiple_variable_declarations("let", "x", "y", Some(create_number(42.0)), Some(create_number(42.42)));
+    let multiple_declarations = create_multiple_variable_declarations(
+        "let",
+        "x",
+        "y",
+        Some(create_number(42.0)),
+        Some(create_number(42.42)),
+    );
 
-    assert!(matches!(multiple_declarations, Node::VariableDeclaration(decl) if decl.declarations.len() == 2));
+    assert!(
+        matches!(multiple_declarations, Node::VariableDeclaration(decl) if decl.declarations.len() == 2)
+    );
 }

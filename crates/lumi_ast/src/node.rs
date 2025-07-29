@@ -84,7 +84,7 @@ pub struct Program {
 // Declarations
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VariableDeclaration {
-    pub kind: String, // "let", "const"
+    pub kind: String,                          // "let", "const"
     pub declarations: Vec<VariableDeclarator>, // Supports multiple declarations like "let x = 5, y = 10, z = 15;"
     pub span: Option<Span>,
 }

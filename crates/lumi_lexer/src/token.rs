@@ -152,11 +152,22 @@ impl Token {
     }
 
     pub fn is_operator(&self) -> bool {
-        matches!(self.kind, 
-            TokenKind::Plus | TokenKind::Minus | TokenKind::Star | TokenKind::Slash | 
-            TokenKind::Percent | TokenKind::Equal | TokenKind::EqualEqual | TokenKind::LessThan |
-            TokenKind::LessThanEqual | TokenKind::GreaterThan | TokenKind::GreaterThanEqual |
-            TokenKind::NotEqual | TokenKind::Increment | TokenKind::Decrement
+        matches!(
+            self.kind,
+            TokenKind::Plus
+                | TokenKind::Minus
+                | TokenKind::Star
+                | TokenKind::Slash
+                | TokenKind::Percent
+                | TokenKind::Equal
+                | TokenKind::EqualEqual
+                | TokenKind::LessThan
+                | TokenKind::LessThanEqual
+                | TokenKind::GreaterThan
+                | TokenKind::GreaterThanEqual
+                | TokenKind::NotEqual
+                | TokenKind::Increment
+                | TokenKind::Decrement
         )
     }
 }
