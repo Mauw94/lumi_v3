@@ -7,8 +7,8 @@ lumi_v3/
 ├── Cargo.toml              # Workspace configuration
 ├── crates/
 │   ├── lumi_lexer/          # Lexical analysis             [X]
-│   ├── lumi_ast/            # Abstract Syntax Tree         [ ]
-│   ├── lumi_parser/         # Syntax analysis              [ ]
+│   ├── lumi_ast/            # Abstract Syntax Tree         [X]
+│   ├── lumi_parser/         # Syntax analysis              [-]
 │   ├── lumi_semantic/       # Semantic analysis            [ ]
 │   ├── lumi_bytecode/       # Bytecode generation          [ ]
 │   ├── lumi_vm/             # Virtual Machine              [ ]
@@ -41,7 +41,7 @@ src/
 
 #### Public API
 ```rust
-pub fn tokenize(source: &str) -> Result<Vec<Token>, LexerError>
+pub fn tokenize(source: &str) -> Result<Vec<Token>, LexError>
 pub fn tokenize_fallback(source: &str) -> Vec<Token>
 pub struct Lexer { /* ... */ }
 pub struct Token { /* ... */ }
@@ -51,3 +51,30 @@ pub enum TokenKind { /* ... */ }
 #### Dependencies
 - `thiserror`: Error handling
 - `serde`: Serialization support
+
+### lumi_ast
+**Purpose** Represents lumi program structure as Abstract Syntax Tree 
+
+#### Architecture
+```
+src/
+├── lib.rs          # Public API and module declarations
+├── node.rs        # AST node definition
+└── visitor.rs        # Visitor pattern implementation
+```
+
+#### Key Components
+- **Node**: All AST node types
+- **Visitor**: Visitor pattern implementation
+
+#### Public API
+```rust
+pub enum Node { /* All AST node variants */ }
+pub trait Visitor { /* Visitor pattern interface */ }
+```
+
+#### Dependencies
+- `serde`: Serialization support
+
+
+### lumi_parser

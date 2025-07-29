@@ -3,7 +3,7 @@
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Source Code   │───▶│   Lexical       │───▶│   Syntax        │
-│   (JavaScript)  │    │   Analysis      │    │   Analysis      │
+│   lumi lang     │    │   Analysis      │    │   Analysis      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
                                 │                       │
                                 ▼                       ▼
@@ -28,3 +28,19 @@
     - Unicode support - **Not yet implemented**
     - Precise position tracking
     - Error handling and recovery
+- **Output**: Stream of tokens with metadata
+
+### 2. Syntax Analysis (lumi_parser)
+- **Purpose**: Converts tokens into Abstract Syntax Tree (AST)
+- **Features**:
+    - Lumi source code parsing
+    - Error recovery mechanisms
+    - Source location preservation
+- **Output**: Validated AST nodes
+
+### 3. Abstract Syntax Tree (lumi_ast)
+- **Purpose**: Represents program structure
+- **Features**:
+    - Source location tracking
+    - Visitor pattern implementation
+- **Output**: Structured program representation

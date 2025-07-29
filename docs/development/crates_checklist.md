@@ -1,8 +1,8 @@
 ## Crate Implementations
 
 - [x] **lumi_lexer** — Lexical analyzer/tokenizer 
-- [ ] **lumi_ast** — Abstract syntax tree 
-- [ ] **lumi_parser** — Parser/syntax analyzer 
+- [x] **lumi_ast** — Abstract syntax tree 
+- [x] **lumi_parser** — Parser/syntax analyzer 
 - [ ] **lumi_semantic** — Semantic analysis 
 - [ ] **lumi_bytecode** — Bytecode generator 
 - [ ] **lumi_vm** — Virtual machine/interpreter 
