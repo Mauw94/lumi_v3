@@ -1,0 +1,16 @@
+[workspace]
+members = [ 
+    "crates/lumi_ast",
+    "crates/lumi_lexer"
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["lumi_v3 Team"]
+description = "lumi programming language"
+
+[workspace.dependencies]
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive" ] }
