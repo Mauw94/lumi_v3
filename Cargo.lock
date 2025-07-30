@@ -265,6 +265,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "lumi_semantic"
+version = "0.1.0"
+dependencies = [
+ "lumi_ast",
+ "lumi_parser",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "memchr"
 version = "2.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

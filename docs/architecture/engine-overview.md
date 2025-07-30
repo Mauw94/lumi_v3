@@ -44,3 +44,13 @@
     - Source location tracking
     - Visitor pattern implementation
 - **Output**: Structured program representation
+
+### 4. Semantic Analysis (lumi_semantic)
+- **Purpose**: Validates program semantics
+- **Features**:
+  - Type checking and scope analysis
+  - Lumi lang validation rules
+  - Error detection and reporting
+  - Static analysis capabilities
+- **Output**: Validated and analyzed AST
+

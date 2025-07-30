@@ -8,14 +8,14 @@ lumi_v3/
 ├── crates/
 │   ├── lumi_lexer/          # Lexical analysis             [X]
 │   ├── lumi_ast/            # Abstract Syntax Tree         [X]
-│   ├── lumi_parser/         # Syntax analysis              [-]
-│   ├── lumi_semantic/       # Semantic analysis            [ ]
+│   ├── lumi_parser/         # Syntax analysis              [x]
+│   ├── lumi_semantic/       # Semantic analysis            [x]
 │   ├── lumi_bytecode/       # Bytecode generation          [ ]
 │   ├── lumi_vm/             # Virtual Machine              [ ]
 │   ├── lumi_runtime/        # Runtime environment          [ ]
 │   ├── lumi_gc/             # Garbage collection           [ ]
 │   └── lumi_api/            # Public API                   [ ]
-└── tests/                 # Integration tests
+└── tests/                   # Integration tests
 ```
 
 ## Individual Crate Architecture
@@ -105,4 +105,37 @@ pub enum ParseError { /* ... */ }
 #### Dependencies
 - `lumi_lexer`: Token input
 - `lumi_ast`: AST output
+- `thiserror`: Error handling
+
+### lumi_semantic
+
+**Purpose**: Validates program semantics and performs static analysis
+
+#### Architecture
+```
+src/
+├── lib.rs          # Public API and module declarations
+├── analyzer.rs     # Main semantic analyzer
+├── scope.rs        # Scope management
+├── types.rs        # Type system
+└── errors.rs       # Semantic error types
+```
+
+#### Key Components
+- **SemanticAnalyzer**: Main analysis engine
+- **Scope**: Variable and function scope management
+- **Type**: Type system implementation
+- **Error Detection**: Semantic error reporting
+
+#### Public API
+```rust
+pub fn analyze(ast: &Node) -> Result<(), Vec<SemanticError>>
+pub struct SemanticAnalyzer { /* ... */ }
+pub struct Scope { /* ... */ }
+pub enum Type { /* ... */ }
+```
+
+#### Dependencies
+- `lumi_ast`: AST input
+- `lumi_parser`: Parser for providing the AST for testing
 - `thiserror`: Error handling

@@ -3,7 +3,7 @@
 - [x] **lumi_lexer** — Lexical analyzer/tokenizer 
 - [x] **lumi_ast** — Abstract syntax tree 
 - [x] **lumi_parser** — Parser/syntax analyzer 
-- [ ] **lumi_semantic** — Semantic analysis 
+- [x] **lumi_semantic** — Semantic analysis 
 - [ ] **lumi_bytecode** — Bytecode generator 
 - [ ] **lumi_vm** — Virtual machine/interpreter 
 - [ ] **lumi_runtime** — Runtime environment/objects 
