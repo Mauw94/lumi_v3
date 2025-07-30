@@ -1,7 +1,3 @@
-Great — with your project structure and detailed architecture documentation, here’s a clean and structured `README.md` draft for the **Lumi V3** language engine:
-
----
-
 # Lumi V3
 
 **Lumi** is a custom programming language with a Rust-based engine inspired by the design and performance characteristics of [Google’s V8 JavaScript engine](https://v8.dev/). Lumi is built from the ground up with modular, well-typed components to tokenize, parse, analyze, and eventually execute Lumi programs.
