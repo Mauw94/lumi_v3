@@ -92,6 +92,7 @@ pub struct VariableDeclaration {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VariableDeclarator {
     pub id: Box<Node>,
+    pub var_type: Option<Box<Node>>, // Optional type annotation
     pub init: Option<Box<Node>>, // The initializer expression (e.g. 5) - can be None if the variable is declared but not initialized.
     pub span: Option<Span>,
 }

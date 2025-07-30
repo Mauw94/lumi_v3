@@ -48,7 +48,7 @@ fn test_expression_nodes() {
 
 #[test]
 fn test_declaration_nodes() {
-    let declaration = create_variable_declaration("let", "x", Some(create_number(42.0)));
+    let declaration = create_variable_declaration("let", "x", None, Some(create_number(42.0)));
 
     assert!(matches!(declaration, Node::VariableDeclaration(decl) if decl.kind == "let"));
 
@@ -56,6 +56,8 @@ fn test_declaration_nodes() {
         "let",
         "x",
         "y",
+        Some("int"),
+        Some("str"),
         Some(create_number(42.0)),
         Some(create_number(42.42)),
     );

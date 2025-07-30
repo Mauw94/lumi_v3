@@ -4,7 +4,7 @@ use lumi_lexer::tokenize;
 
 #[test]
 fn test_lexer_performance_simple() {
-    let source = "let x = 42;";
+    let source = "let x: int -> 42;";
     let start = Instant::now();
 
     for _ in 0..1000 {
@@ -21,7 +21,7 @@ fn test_lexer_performance_simple() {
 #[test]
 fn test_lexer_performance_complex() {
     let source = r#"
-        function fibonacci(n) {
+        fn fibonacci(n) {
             if (n <= 1) {
                 return n;
             }
@@ -49,7 +49,7 @@ fn test_lexer_performance_complex() {
 fn test_lexer_performance_large_source() {
     let mut source = String::new();
     for i in 0..1000 {
-        source.push_str(&format!("let var = {} = {};", i, i));
+        source.push_str(&format!("let const = {} = {};", i, i));
     }
 
     let start = Instant::now();
@@ -71,7 +71,7 @@ fn test_lexer_performance_large_source() {
 
 #[test]
 fn test_lexer_memory_usage() {
-    let source = "let x = 42;";
+    let source = "let x: int -> 42;";
     let tokens = tokenize(source).unwrap();
 
     let token_count = tokens.len();

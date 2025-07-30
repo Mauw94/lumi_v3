@@ -73,6 +73,7 @@ pub enum TokenKind {
     Assign,
     PlusAssign,
     MinusAssign,
+    Arrow,
     // TODO: extend
 
     // Comparison

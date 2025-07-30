@@ -2,7 +2,7 @@ use lumi_lexer::{Lexer, token::TokenKind, tokenize};
 
 #[test]
 fn test_lexer_creation() {
-    let source = "let x = 42;";
+    let source = "let x: int -> 42;";
     let mut lexer = Lexer::new(source);
 
     // Test that lexer was created successfully
@@ -47,8 +47,7 @@ fn test_keyword_tokenization() {
     let keywords = vec![
         "let",
         "const",
-        "var",
-        "function",
+        "fn",
         "if",
         "else",
         "return",
@@ -90,6 +89,7 @@ fn test_operator_tokenization() {
         ("/", TokenKind::Slash),
         ("=", TokenKind::Assign),
         ("==", TokenKind::Equal),
+        ("->", TokenKind::Arrow),
         ("!=", TokenKind::NotEqual),
         ("++", TokenKind::Increment),
         ("--", TokenKind::Decrement),
@@ -123,4 +123,18 @@ fn test_comment_tokenization() {
         tokens[0].kind,
         TokenKind::Comment(" this is a block comment ".to_string())
     );
+}
+
+#[test]
+fn test_variable_declaration() {
+    let source = "let x: int -> 42;";
+    let tokens = tokenize(source).unwrap();
+
+    assert_eq!(tokens.len(), 8); // let + identifier + colon + identifier + assign + number + semicolon + EOF
+    assert_eq!(tokens[0].kind, TokenKind::Keyword("let".to_string()));
+    assert_eq!(tokens[1].kind, TokenKind::Identifier("x".to_string()));
+    assert_eq!(tokens[2].kind, TokenKind::Colon);
+    assert_eq!(tokens[3].kind, TokenKind::Keyword("int".to_string()));
+    assert_eq!(tokens[4].kind, TokenKind::Arrow);
+    assert_eq!(tokens[5].kind, TokenKind::Number(42.0));
 }

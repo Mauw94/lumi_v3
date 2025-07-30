@@ -120,16 +120,15 @@ impl Lexer {
             "this" => Ok(TokenKind::Keyword("this".to_string())),
             "super" => Ok(TokenKind::Keyword("super".to_string())),
             // keywords
-            "let" | "const" | "var" | "function" | "if" | "else" | "return" | "async" | "await"
-            | "yield" | "import" | "export" | "new" | "class" | "extends" | "static" | "get"
-            | "set" | "try" | "catch" | "finally" | "throw" | "break" | "continue" | "switch"
-            | "case" | "default" | "for" | "while" | "do" | "in" | "of" | "with" | "delete"
+            "let" | "const" | "fn" | "if" | "else" | "return" | "async" | "await" | "yield"
+            | "import" | "export" | "new" | "class" | "extends" | "static" | "get" | "set"
+            | "try" | "catch" | "finally" | "throw" | "break" | "continue" | "switch" | "case"
+            | "default" | "for" | "while" | "do" | "in" | "of" | "with" | "delete"
             | "instanceof" | "typeof" | "void" | "debugger" | "enum" | "interface" | "package"
             | "private" | "protected" | "public" | "implements" | "abstract" | "boolean"
-            | "byte" | "char" | "double" | "final" | "float" | "goto" | "int" | "long"
-            | "native" | "short" | "synchronized" | "throws" | "transient" | "volatile" => {
-                Ok(TokenKind::Keyword(identifier))
-            }
+            | "byte" | "char" | "double" | "final" | "float" | "goto" | "int" | "long" | "str"
+            | "native" | "short" | "synchronized" | "throws" | "transient" | "volatile" | "to"
+            | "step" => Ok(TokenKind::Keyword(identifier)),
             _ => Ok(TokenKind::Identifier(identifier)),
         }
     }
@@ -373,6 +372,11 @@ impl Lexer {
                     self.advance();
                     self.advance();
                     return Ok(TokenKind::Decrement);
+                }
+                "->" => {
+                    self.advance();
+                    self.advance();
+                    return Ok(TokenKind::Arrow);
                 }
                 // "&&" => {
                 //     self.advance();

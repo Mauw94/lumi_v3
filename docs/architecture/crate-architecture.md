@@ -59,8 +59,8 @@ pub enum TokenKind { /* ... */ }
 ```
 src/
 ├── lib.rs          # Public API and module declarations
-├── node.rs        # AST node definition
-└── visitor.rs        # Visitor pattern implementation
+├── node.rs         # AST node definition
+└── visitor.rs      # Visitor pattern implementation
 ```
 
 #### Key Components

@@ -32,6 +32,9 @@ impl Visitor for IdentifierCollector {
                     if let Some(init) = &var_decl.init {
                         self.visit_node(init);
                     }
+                    if let Some(var_type) = &var_decl.var_type {
+                        self.visit_node(var_type);
+                    }
                 }
             }
             Node::BinaryExpression(expr) => {
@@ -53,13 +56,14 @@ fn test_identifier_collector_visitor() {
     let mut collector = IdentifierCollector::new();
 
     let ast = create_program(vec![
-        create_variable_declaration("let", "x", Some(create_identifier("y"))),
+        create_variable_declaration("let", "x", Some("str"), Some(create_identifier("y"))),
         create_binary_expression(create_identifier("a"), "+", create_identifier("b")),
     ]);
 
     collector.visit_node(&ast);
 
-    assert_eq!(collector.identifiers.len(), 4);
+    assert_eq!(collector.identifiers.len(), 5);
+    assert!(collector.identifiers.contains(&"str".to_string()));
     assert!(collector.identifiers.contains(&"x".to_string()));
     assert!(collector.identifiers.contains(&"y".to_string()));
     assert!(collector.identifiers.contains(&"a".to_string()));
