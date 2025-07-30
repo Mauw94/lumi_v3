@@ -15,6 +15,9 @@ pub trait Visitor {
             Node::Null => self.visit_null(),
             Node::Identifier(i) => self.visit_identifier(i),
             Node::Undefined => self.visit_undefined(),
+            Node::UnaryExpression(_) => todo!(),
+            Node::PrintStatement(_) => todo!(),
+            Node::ArrayLiteral(_) => todo!(),
         }
     }
 

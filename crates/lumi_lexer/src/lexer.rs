@@ -128,7 +128,7 @@ impl Lexer {
             | "private" | "protected" | "public" | "implements" | "abstract" | "boolean"
             | "byte" | "char" | "double" | "final" | "float" | "goto" | "int" | "long" | "str"
             | "native" | "short" | "synchronized" | "throws" | "transient" | "volatile" | "to"
-            | "step" => Ok(TokenKind::Keyword(identifier)),
+            | "step" | "print" => Ok(TokenKind::Keyword(identifier)),
             _ => Ok(TokenKind::Identifier(identifier)),
         }
     }

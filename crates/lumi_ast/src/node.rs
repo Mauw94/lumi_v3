@@ -62,9 +62,13 @@ pub enum Node {
 
     // Expressions
     BinaryExpression(BinaryExpression),
+    UnaryExpression(UnaryExpression),
+
     // Statements
+    PrintStatement(PrintStatement),
 
     // Literals
+    ArrayLiteral(ArrayLiteral),
 
     // Other
     String(String),
@@ -104,5 +108,27 @@ pub struct BinaryExpression {
     pub left: Box<Node>,
     pub operator: String,
     pub right: Box<Node>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UnaryExpression {
+    pub operator: String,
+    pub argument: Box<Node>,
+    pub prefix: bool, // true for prefix (e.g. -x), false for postfix (e.g. x++)
+    pub span: Option<Span>,
+}
+
+// Statements
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct PrintStatement {
+    pub argument: Box<Option<Node>>,
+    pub span: Option<Span>,
+}
+
+// Literals
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ArrayLiteral {
+    pub elements: Vec<Option<Node>>,
     pub span: Option<Span>,
 }
