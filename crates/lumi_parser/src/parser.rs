@@ -3,7 +3,7 @@ use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
 
 use crate::{
     error::{ParseResult, ParserError},
-    recovery::{ErrorRecovery, ParsingContext},
+    recovery::{ErrorRecovery, ParsingContext, RecoveryContext, RecoveryStrategy},
 };
 
 /// Main parser struct that holds the source code, lexer, and parsing state
@@ -61,8 +61,13 @@ impl Parser {
         while !self.is_eof() {
             match self.parse_statement() {
                 Ok(stmt) => body.push(stmt),
-                Err(err) => {
-                    // TODO: handle error recovery
+                Err(error) => {
+                    if !self.try_recover_from_error(error.clone()) {
+                        return Err(error);
+                    }
+                    if self.is_eof() {
+                        break; // Stop parsing if we reach EOF
+                    }
                 }
             }
         }
@@ -308,6 +313,11 @@ impl Parser {
         })
     }
 
+    /// Get the current token
+    fn current_token(&self) -> Option<&Token> {
+        self.current.as_ref()
+    }
+
     /// Create a span from the current and previous token positions
     fn create_span_from_tokens(&self) -> Span {
         let start = self.previous_position().unwrap_or_default();
@@ -320,5 +330,126 @@ impl Parser {
         let start = start.unwrap_or_default();
         let end = end.unwrap_or_default();
         Span::new(start, end)
+    }
+
+    fn try_recover_from_error(&mut self, error: ParserError) -> bool {
+        if !self.error_recovery.can_recover() {
+            return false; // No recovery possible
+        }
+
+        self.error_recovery.record_error(error);
+
+        let context = RecoveryContext::new(
+            self.current.clone(),
+            self.previous.clone(),
+            self.context.clone(),
+        );
+
+        let strategy = context.determine_strategy();
+
+        match strategy {
+            RecoveryStrategy::SkipUntil(tokens) => {
+                while !self.is_eof() {
+                    if let Some(token) = self.current_token() {
+                        if tokens
+                            .iter()
+                            .any(|t| format!("{:?}", token.kind).contains(t))
+                        {
+                            break;
+                        }
+                    }
+                    self.advance();
+                }
+                true
+            }
+
+            RecoveryStrategy::SkipUntilStatement => {
+                while !self.is_eof() {
+                    if let Some(token) = self.current_token() {
+                        match token.kind {
+                            TokenKind::Semicolon | TokenKind::RightBrace => break,
+                            _ => self.advance(),
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                true
+            }
+
+            RecoveryStrategy::SkipUntilBlock => {
+                while !self.is_eof() {
+                    if let Some(token) = self.current_token() {
+                        if matches!(token.kind, TokenKind::RightBrace) {
+                            break;
+                        }
+                    }
+                    self.advance();
+                }
+                true
+            }
+
+            RecoveryStrategy::SkipUntilFunction => {
+                while !self.is_eof() {
+                    if let Some(token) = self.current_token() {
+                        match token.kind {
+                            TokenKind::RightBrace | TokenKind::Semicolon => break,
+                            _ => self.advance(),
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                true
+            }
+
+            RecoveryStrategy::SkipUntilClass => {
+                while !self.is_eof() {
+                    if let Some(token) = self.current_token() {
+                        if matches!(token.kind, TokenKind::RightBrace) {
+                            break;
+                        }
+                    }
+                    self.advance();
+                }
+                true
+            }
+
+            RecoveryStrategy::SkipUntilModule => {
+                while !self.is_eof() {
+                    let should_break = if let Some(token) = &self.current {
+                        matches!(token.kind, TokenKind::RightBrace)
+                            || matches!(token.kind, TokenKind::Keyword(ref kw) if kw == "import" || kw == "export")
+                    } else {
+                        false
+                    };
+
+                    if should_break {
+                        break;
+                    }
+                    self.advance();
+                }
+                true
+            }
+
+            RecoveryStrategy::InsertToken(_) => {
+                // Simplified: just advance
+                self.advance();
+                true
+            }
+
+            RecoveryStrategy::ReplaceToken(_) => {
+                // Simplified: just advance
+                self.advance();
+                true
+            }
+
+            RecoveryStrategy::DeleteToken => {
+                self.advance();
+                true
+            }
+
+            RecoveryStrategy::NoRecovery => false,
+        }
     }
 }

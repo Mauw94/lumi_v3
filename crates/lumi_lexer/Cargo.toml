@@ -2,7 +2,7 @@
 name = "lumi_lexer"
 version = "0.1.0"
 edition = "2024"
-description = "Lexer for the Lumi programming language"
+description = "Lexer for the Lumi engine"
 license = "MIT"
 
 [dependencies]

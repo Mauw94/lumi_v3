@@ -9,7 +9,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 authors = ["lumi_v3 Team"]
-description = "lumi programming language"
+description = "Lumi engine"
 
 [workspace.dependencies]
 thiserror = "1.0"

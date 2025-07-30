@@ -78,3 +78,31 @@ pub trait Visitor { /* Visitor pattern interface */ }
 
 
 ### lumi_parser
+
+**Purpose**: Converts tokens into Abstract Syntax Tree
+
+#### Architecture
+```
+src/
+├── lib.rs          # Public API and module declarations
+├── parser.rs       # Main parser implementation
+├── error.rs        # Parser-specific error types
+└── recovery.rs     # Error recovery mechanisms
+```
+
+#### Key Components
+- **Parser**: Main parsing engine with recursive descent implementation
+- **ParseResult**: Result type for parsing operations
+- **Error Recovery**: Mechanisms for handling syntax errors gracefully
+
+#### Public API
+```rust
+pub fn parse(tokens: &[Token]) -> ParseResult<Node>
+pub struct Parser { /* ... */ }
+pub enum ParseError { /* ... */ }
+```
+
+#### Dependencies
+- `lumi_lexer`: Token input
+- `lumi_ast`: AST output
+- `thiserror`: Error handling

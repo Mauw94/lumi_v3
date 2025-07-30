@@ -2,7 +2,7 @@
 name = "lumi_parser"
 version = "0.1.0"
 edition = "2021"
-description = "Parser for Lumi programming language"
+description = "Parser for Lumi engine"
 license = "MIT"
 
 [dependencies]
