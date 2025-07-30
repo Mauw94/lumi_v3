@@ -72,6 +72,7 @@ pub enum Node {
     Boolean(bool),
     Number(f64),
     Null,
+    Undefined,
 }
 
 // Program structure
@@ -94,7 +95,7 @@ pub struct VariableDeclarator {
     pub id: Box<Node>,
     pub var_type: Option<Box<Node>>, // Optional type annotation
     pub init: Option<Box<Node>>, // The initializer expression (e.g. 5) - can be None if the variable is declared but not initialized.
-    pub span: Option<Span>,
+    pub span: Option<Span>,      // Span of the declarator
 }
 
 // Expressions

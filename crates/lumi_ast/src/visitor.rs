@@ -14,6 +14,7 @@ pub trait Visitor {
             Node::Number(n) => self.visit_number(*n),
             Node::Null => self.visit_null(),
             Node::Identifier(i) => self.visit_identifier(i),
+            Node::Undefined => self.visit_undefined(),
         }
     }
 
@@ -39,6 +40,9 @@ pub trait Visitor {
         unimplemented!()
     }
     fn visit_null(&mut self) -> Self::Output {
+        unimplemented!()
+    }
+    fn visit_undefined(&mut self) -> Self::Output {
         unimplemented!()
     }
 }

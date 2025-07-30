@@ -1,9 +1,14 @@
 [package]
 name = "lumi_parser"
-version.workspace = true
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
-description.workspace = true
+version = "0.1.0"
+edition = "2021"
+description = "Parser for Lumi programming language"
+license = "MIT"
 
 [dependencies]
+lumi_ast = { path = "../lumi_ast" }
+lumi_lexer = { path = "../lumi_lexer" }
+thiserror = "1.0"
+
+[dev-dependencies]
+criterion = "0.5"

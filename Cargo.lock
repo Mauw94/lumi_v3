@@ -257,6 +257,12 @@ dependencies = [
 [[package]]
 name = "lumi_parser"
 version = "0.1.0"
+dependencies = [
+ "criterion",
+ "lumi_ast",
+ "lumi_lexer",
+ "thiserror",
+]
 
 [[package]]
 name = "memchr"
