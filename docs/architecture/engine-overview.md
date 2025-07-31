@@ -61,3 +61,21 @@
   - Constant pool optimization
   - All ECMAScript features supported
 - **Output**: Optimized bytecode instructions
+
+### 6. Virtual Machine (lumi_vm)
+- **Purpose**: Executes bytecode instructions
+- **Features**:
+  - Stack-based execution engine
+  - Register management system
+  - Function and closure support
+  - Memory management integration
+- **Output**: Program execution results
+
+### 7. Runtime Environment (lumi_runtime)
+- **Purpose**: Provides runtime services
+- **Features**:
+  - Value system (primitives and objects)
+  - Context and scope management
+  - Function execution framework
+  - Object and array operations
+- **Output**: Runtime values and objects

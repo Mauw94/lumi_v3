@@ -1,6 +1,7 @@
 mod generator;
 mod instruction;
 
+pub use generator::Bytecode;
 pub use generator::BytecodeGenerator;
 pub use instruction::{Constant, ConstantPool, Instruction};
 

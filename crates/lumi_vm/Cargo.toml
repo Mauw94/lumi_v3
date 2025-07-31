@@ -1,0 +1,11 @@
+[package]
+name = "lumi_vm"
+version = "0.1.0"
+edition = "2021"
+description = "Virtual Machine for Lumi engine"
+license = "MIT"
+
+[dependencies]
+lumi_parser = { path = "../lumi_parser" }
+lumi_ast = { path = "../lumi_ast" }
+lumi_bytecode = { path = "../lumi_bytecode" }

@@ -2,7 +2,7 @@
 members = [ 
     "crates/lumi_ast", "crates/lumi_bytecode",
     "crates/lumi_lexer"
-, "crates/lumi_parser", "crates/lumi_semantic"]
+, "crates/lumi_parser", "crates/lumi_runtime", "crates/lumi_semantic", "crates/lumi_vm"]
 
 [workspace.package]
 version = "0.1.0"

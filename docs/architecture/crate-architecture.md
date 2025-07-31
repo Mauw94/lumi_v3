@@ -169,3 +169,72 @@ pub struct ConstantPool { /* ... */ }
 #### Dependencies
 - `lumi_ast`: AST input
 - `thiserror`: Error handling
+
+### lumi_vm
+
+**Purpose**: Executes bytecode instructions
+
+#### Architecture
+```
+src/
+├── lib.rs          # Public API and module declarations
+├── executor.rs     # Main execution engine
+├── bytecode.rs     # Bytecode representation
+├── instructions.rs # Instruction implementations
+├── frame.rs        # Call frame management
+├── stack.rs        # Execution stack
+├── registers.rs    # Register management
+├── value.rs        # Runtime values
+└── heap.rs         # Memory management
+```
+
+#### Key Components
+- **Executor**: Main virtual machine engine
+- **Frame**: Function call frame management
+- **Stack**: Execution stack operations
+- **Value**: Runtime value representation
+
+#### Public API
+```rust
+pub fn execute(bytecode: &Bytecode) -> Result<Value, VMError>
+pub struct Vm { /* ... */ }
+pub struct Frame { /* ... */ }
+pub struct Stack { /* ... */ }
+pub enum Value { /* ... */ }
+```
+
+#### Dependencies
+- `lumi_ast`: AST types for values
+- `lumi_runtime`: Runtime environment
+- `thiserror`: Error handling
+
+### lumi_runtime
+
+**Purpose**: Provides runtime environment and value system
+
+#### Architecture
+```
+src/
+├── lib.rs          # Public API and module declarations
+├── value.rs        # Runtime value system
+├── object.rs       # Object representation
+├── function.rs     # Function execution
+└── context.rs      # Execution context
+```
+
+#### Key Components
+- **Value**: Runtime value representation
+- **Object**: Object and array management
+- **Function**: Function execution framework
+- **Context**: Execution context management
+
+#### Public API
+```rust
+pub enum Value { /* Runtime value types */ }
+pub struct Object { /* ... */ }
+pub struct Function { /* ... */ }
+pub struct Context { /* ... */ }
+```
+
+#### Dependencies
+- `thiserror`: Error handling

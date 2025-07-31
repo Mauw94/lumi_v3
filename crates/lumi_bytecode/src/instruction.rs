@@ -49,4 +49,5 @@ pub enum Constant {
     String(String),
     Boolean(bool),
     Null,
+    Undefined,
 }

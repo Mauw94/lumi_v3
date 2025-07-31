@@ -140,6 +140,27 @@ pub fn generate(ast: &Node) -> Bytecode
 
 ---
 
+### 🖥️ `lumi_vm` - Virtual Machine
+
+- **Input**: Lumi Bytecode
+- **Output**: Runtime execution result
+- **Features**:
+  - Stack-based execution model
+  - Register and call frame support
+  - Instruction interpretation
+
+```rust
+pub fn execute(bytecode: &Bytecode) -> Result<Value, VMError>
+```
+
+### 🧩 `lumi_runtime` - Runtime Environment
+
+- **Purpose**: Runtime environment and value system
+- **Features**:
+  - Context handling
+  - Object and function models
+  - Value representation for dynamic types
+
 ## 📦 Dependencies
 
 Common crates used:
@@ -152,11 +173,14 @@ Common crates used:
 ## 🛠 Build & Test
 
 ```bash
+# Check formatting
+cargo fmt --all
+
 # Build the entire workspace
-cargo build --workspace
+cargo build --all
 
 # Run all tests
-cargo test --workspace
+cargo test --all
 ```
 
 ---
@@ -167,13 +191,13 @@ cargo test --workspace
 * [x] Parser
 * [x] AST
 * [x] Semantic Analyzer
-* [ ] Bytecode Generator
-* [ ] Virtual Machine
+* [x] Bytecode Generator
+* [x] Virtual Machine
 * [ ] Garbage Collector
-* [ ] Runtime
+* [x] Runtime
 * [ ] Public API
 
-🛠 Note: While the foundational crates (lumi_lexer, lumi_ast, lumi_parser, and lumi_semantic) are implemented, they are actively under development. Functionality is expanding as Lumi evolves into a more expressive and capable language. Expect breaking changes, experimental features, and rapid iteration.
+🛠 Note: While the foundational crates (lumi_lexer, lumi_ast, lumi_parser, lumi_semantic, lumi_bytecode, lumi_vm and lumi_runtime) are implemented, they are actively under development. Functionality is expanding as Lumi evolves into a more expressive and capable language. Expect breaking changes, experimental features, and rapid iteration.
 ---
 
 ## 📄 License

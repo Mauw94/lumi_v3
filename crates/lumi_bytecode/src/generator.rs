@@ -2,6 +2,11 @@ use lumi_ast::Node;
 
 use crate::instruction::{Constant, ConstantPool, Instruction};
 
+pub struct Bytecode {
+    pub instructions: Vec<Instruction>,
+    pub constants: Vec<Constant>,
+}
+
 /// Bytecode generator for Lumi engine
 pub struct BytecodeGenerator {
     pub constants: ConstantPool,
@@ -16,8 +21,12 @@ impl BytecodeGenerator {
         }
     }
 
-    pub fn generate(&mut self, node: &Node) {
+    pub fn generate(&mut self, node: &Node) -> Bytecode {
         self.visit_node(node);
+        Bytecode {
+            instructions: self.instructions.clone(),
+            constants: self.constants.values.clone(),
+        }
     }
 
     fn visit_node(&mut self, node: &Node) {
