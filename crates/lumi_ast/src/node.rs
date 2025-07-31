@@ -66,6 +66,7 @@ pub enum Node {
 
     // Statements
     PrintStatement(PrintStatement),
+    ExpressionStatement(ExpressionStatement),
 
     // Literals
     ArrayLiteral(ArrayLiteral),
@@ -123,6 +124,12 @@ pub struct UnaryExpression {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PrintStatement {
     pub argument: Box<Option<Node>>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ExpressionStatement {
+    pub expression: Box<Node>,
     pub span: Option<Span>,
 }
 

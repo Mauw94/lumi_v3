@@ -1,4 +1,6 @@
-use lumi_ast::{Node, Position, Program, Span, VariableDeclaration, VariableDeclarator};
+use lumi_ast::{
+    ExpressionStatement, Node, Position, Program, Span, VariableDeclaration, VariableDeclarator,
+};
 use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
 
 use crate::{
@@ -100,11 +102,7 @@ impl Parser {
                         Ok(Node::Null)
                     }
                 },
-                _ => {
-                    // NOTE: temporary placeholder
-                    self.advance(); // Advance to the next token or we end up in an infinite loop
-                    Ok(Node::Null)
-                }
+                _ => self.parse_expression_statement(),
             }
         } else {
             Err(ParserError::unexpected_end_of_file(None))
@@ -185,6 +183,20 @@ impl Parser {
         } else {
             Err(ParserError::unexpected_end_of_file(None))
         }
+    }
+
+    fn parse_expression_statement(&mut self) -> ParseResult<Node> {
+        let expr = self.parse_expression()?;
+
+        if self.check(TokenKind::Semicolon) {
+            self.advance(); // consume the semicolon
+        }
+
+        let span = self.create_span_from_tokens();
+        Ok(Node::ExpressionStatement(ExpressionStatement {
+            expression: Box::new(expr),
+            span: Some(span),
+        }))
     }
 
     fn parse_expression(&mut self) -> ParseResult<Node> {

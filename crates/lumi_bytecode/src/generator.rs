@@ -36,6 +36,9 @@ impl BytecodeGenerator {
                     }
                 }
             }
+            Node::ExpressionStatement(stmt) => {
+                self.visit_node(&stmt.expression);
+            }
             Node::Number(num) => {
                 let idx = self.constants.add(Constant::Number(*num));
                 self.instructions.push(Instruction::PushConst(idx));

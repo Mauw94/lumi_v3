@@ -16,15 +16,15 @@ fn test_number() {
 
     if let Ok(Node::Program(program)) = result {
         assert_eq!(program.body.len(), 1);
-        // if let Node::ExpressionStatement(stmt) = &program.body[0] {
-        //    if let Node::Number(num) = &stmt.expression {
-        //      assert_eq!(*num, 42.0);
-        //    } else {
-        //        panic!("Expected a number expression");
-        //    }
-        // } else {
-        //     panic!("Expected an expression statement");
-        // }
+        if let Node::ExpressionStatement(stmt) = &program.body[0] {
+            if let Node::Number(num) = &*stmt.expression {
+                assert_eq!(*num, 42.0);
+            } else {
+                panic!("Expected a number expression");
+            }
+        } else {
+            panic!("Expected an expression statement");
+        }
     } else {
         panic!("Expected a program node");
     }

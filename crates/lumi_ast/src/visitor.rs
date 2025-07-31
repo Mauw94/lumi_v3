@@ -18,6 +18,7 @@ pub trait Visitor {
             Node::UnaryExpression(_) => todo!(),
             Node::PrintStatement(_) => todo!(),
             Node::ArrayLiteral(_) => todo!(),
+            Node::ExpressionStatement(expression_statement) => todo!(),
         }
     }
 
