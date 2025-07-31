@@ -1,9 +1,0 @@
-[package]
-name = "lumi_runtime"
-version = "0.1.0"
-edition = "2021"
-description = "Runtime for Lumi engine"
-license = "MIT"
-
-[dependencies]
-lumi_ast = { path = "../lumi_ast" }
