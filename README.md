@@ -125,6 +125,21 @@ pub fn analyze(ast: &Node) -> Result<(), Vec<SemanticError>>
 
 ---
 
+### ⚙️ `lumi_bytecode` - Bytecode Generation
+
+- **Input**: AST
+- **Output**: Lumi Bytecode
+- **Features**:
+  - Instruction generation
+  - Constant pool optimization
+  - Expandable for custom instruction sets
+
+```rust
+pub fn generate(ast: &Node) -> Bytecode
+```
+
+---
+
 ## 📦 Dependencies
 
 Common crates used:

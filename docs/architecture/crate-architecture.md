@@ -139,3 +139,33 @@ pub enum Type { /* ... */ }
 - `lumi_ast`: AST input
 - `lumi_parser`: Parser for providing the AST for testing
 - `thiserror`: Error handling
+
+### lumi_bytecode
+
+**Purpose**: Generates bytecode from Abstract Syntax Tree
+
+#### Architecture
+```
+src/
+├── lib.rs          # Public API and module declarations
+├── generator.rs    # Bytecode generation engine
+├── instructions.rs # Instruction set definition
+└── tests.rs        # Internal test utilities
+```
+
+#### Key Components
+- **BytecodeGenerator**: Main generation engine
+- **Instruction**: Enumeration of all bytecode instructions
+- **ConstantPool**: Optimization for literal storage
+
+#### Public API
+```rust
+pub fn generate(ast: &Node) -> Bytecode
+pub struct BytecodeGenerator { /* ... */ }
+pub enum Instruction { /* ... */ }
+pub struct ConstantPool { /* ... */ }
+```
+
+#### Dependencies
+- `lumi_ast`: AST input
+- `thiserror`: Error handling

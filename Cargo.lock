@@ -245,6 +245,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "lumi_bytecode"
+version = "0.1.0"
+dependencies = [
+ "lumi_ast",
+ "lumi_parser",
+]
+
+[[package]]
 name = "lumi_lexer"
 version = "0.1.0"
 dependencies = [

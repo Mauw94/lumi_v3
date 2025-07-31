@@ -1,0 +1,10 @@
+[package]
+name = "lumi_bytecode"
+version = "0.1.0"
+edition = "2021"
+description = "Bytecode generator for Lumi engine"
+license = "MIT"
+
+[dependencies]
+lumi_ast = { path = "../lumi_ast" }
+lumi_parser = { path = "../lumi_parser" }
