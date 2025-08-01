@@ -1,5 +1,6 @@
 use lumi_ast::{
-    ExpressionStatement, Node, Position, Program, Span, VariableDeclaration, VariableDeclarator,
+    AssignmentExpression, BinaryExpression, ExpressionStatement, LogicalExpression, Node, Position,
+    Program, Span, UnaryExpression, VariableDeclaration, VariableDeclarator,
 };
 use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
 
@@ -200,13 +201,308 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> ParseResult<Node> {
-        // TODO: chain of epxression parsing
-        // self.parse_assignment_expression()
-        self.parse_primary_expression() // TODO: temporary until we implement full expression parsing
+        self.parse_assignment_expression()
     }
 
     fn parse_assignment_expression(&mut self) -> ParseResult<Node> {
-        unreachable!()
+        let left = self.parse_logical_or_expression()?;
+
+        if self.is_assignment_operator() {
+            let operator = self.current_token_string();
+            self.advance(); // Consume operator
+            let right = Box::new(self.parse_assignment_expression()?);
+
+            let span = self.create_span_from_tokens();
+            return Ok(Node::AssignmentExpression(AssignmentExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            }));
+        } else {
+            return Ok(left);
+        }
+    }
+
+    fn parse_logical_or_expression(&mut self) -> ParseResult<Node> {
+        let mut left = self.parse_logical_and_expression()?;
+
+        while self.check(TokenKind::LogicalOr) {
+            let operator = self.current_token_string();
+            self.advance(); // consume the 'or' token
+            let right = Box::new(self.parse_logical_and_expression()?);
+            let span = self.create_span_from_tokens();
+
+            left = Node::LogicalExpression(LogicalExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn parse_logical_and_expression(&mut self) -> ParseResult<Node> {
+        let mut left = self.parse_equality_expression()?;
+
+        while self.check(TokenKind::LogicalAnd) {
+            let operator = self.current_token_string();
+            self.advance(); // consume the 'and' token
+            let right = Box::new(self.parse_equality_expression()?);
+            let span = self.create_span_from_tokens();
+
+            left = Node::LogicalExpression(LogicalExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn parse_equality_expression(&mut self) -> ParseResult<Node> {
+        let mut left = self.parse_relational_expression()?;
+
+        while self.is_equality_operator() {
+            let operator = self.current_token_string();
+            self.advance(); // consume the equality operator
+            let right = Box::new(self.parse_relational_expression()?);
+            let span = self.create_span_from_tokens();
+
+            left = Node::BinaryExpression(BinaryExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn parse_relational_expression(&mut self) -> ParseResult<Node> {
+        let mut left = self.parse_additive_expression()?;
+
+        while self.is_relational_operator() {
+            let operator = self.current_token_string();
+            self.advance(); // consume the relational operator
+            let right = Box::new(self.parse_additive_expression()?);
+            let span = self.create_span_from_tokens();
+
+            left = Node::BinaryExpression(BinaryExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn parse_additive_expression(&mut self) -> ParseResult<Node> {
+        let mut left = self.parse_multiplicative_expression()?;
+
+        while self.is_additive_operator() {
+            let operator = self.current_token_string();
+            self.advance(); // consume the operator
+            let right = Box::new(self.parse_multiplicative_expression()?);
+            let span = self.create_span_from_tokens();
+
+            left = Node::BinaryExpression(BinaryExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn parse_multiplicative_expression(&mut self) -> ParseResult<Node> {
+        let mut left = self.parse_unary_expression()?;
+
+        while self.is_multiplicative_operator() {
+            let operator = self.current_token_string();
+            self.advance(); // consume the operator
+            let right = Box::new(self.parse_unary_expression()?);
+            let span = self.create_span_from_tokens();
+
+            left = Node::BinaryExpression(BinaryExpression {
+                left: Box::new(left),
+                operator,
+                right,
+                span: Some(span),
+            });
+        }
+
+        Ok(left)
+    }
+
+    fn parse_unary_expression(&mut self) -> ParseResult<Node> {
+        if self.is_unary_operator() {
+            let operator = self.current_token_string();
+            let prefix = true;
+            self.advance(); // Consume operator
+            let argument = Box::new(self.parse_unary_expression()?);
+
+            let span = self.create_span_from_tokens();
+            return Ok(Node::UnaryExpression(UnaryExpression {
+                operator,
+                argument,
+                prefix,
+                span: Some(span),
+            }));
+        }
+
+        self.parse_postfix_expression()
+    }
+
+    fn parse_postfix_expression(&mut self) -> ParseResult<Node> {
+        self.parse_primary_expression()
+        // let mut expr = self.parse_primary_expression()?;
+
+        // TODO: add later
+        //   loop {
+        //     if let Some(token) = &self.current {
+        //         match &token.kind {
+        //             TokenKind::LeftBracket => {
+        //                 self.advance(); // Consume '['
+        //                 let property = Box::new(self.parse_expression()?);
+        //                 self.expect(TokenKind::RightBracket)?;
+
+        //                 let span = self.create_span_from_tokens();
+        //                 expr = Node::MemberExpression(MemberExpression {
+        //                     object: Box::new(expr),
+        //                     property,
+        //                     computed: true,
+        //                     optional: false,
+        //                     span: Some(span),
+        //                 });
+        //             }
+
+        //             TokenKind::Dot => {
+        //                 self.advance(); // Consume '.'
+        //                 let property = Box::new(self.parse_identifier()?);
+
+        //                 let span = self.create_span_from_tokens();
+        //                 expr = Node::MemberExpression(MemberExpression {
+        //                     object: Box::new(expr),
+        //                     property,
+        //                     computed: false,
+        //                     optional: false,
+        //                     span: Some(span),
+        //                 });
+        //             }
+
+        //             TokenKind::LeftParen => {
+        //                 self.advance(); // Consume '('
+        //                 let arguments = self.parse_arguments()?;
+        //                 self.expect(TokenKind::RightParen)?;
+
+        //                 let span = self.create_span_from_tokens();
+        //                 expr = Node::CallExpression(CallExpression {
+        //                     callee: Box::new(expr),
+        //                     arguments,
+        //                     span: Some(span),
+        //                 });
+        //             }
+
+        //             TokenKind::Increment | TokenKind::Decrement => {
+        //                 let operator = self.current_token_string();
+        //                 let prefix = false;
+        //                 self.advance(); // Consume operator
+
+        //                 let span = self.create_span_from_tokens();
+        //                 expr = Node::UpdateExpression(UpdateExpression {
+        //                     operator,
+        //                     argument: Box::new(expr),
+        //                     prefix,
+        //                     span: Some(span),
+        //                 });
+        //             }
+
+        //             _ => break,
+        //         }
+        //     } else {
+        //         break;
+        //     }
+        // }
+
+        // Ok(expr)
+    }
+
+    fn is_unary_operator(&self) -> bool {
+        if let Some(token) = &self.current {
+            matches!(
+                token.kind,
+                TokenKind::Plus | TokenKind::Minus | TokenKind::Increment | TokenKind::Decrement
+            )
+        } else {
+            false
+        }
+    }
+
+    fn is_multiplicative_operator(&self) -> bool {
+        if let Some(token) = &self.current {
+            matches!(
+                token.kind,
+                TokenKind::Star | TokenKind::Slash | TokenKind::Percent
+            )
+        } else {
+            false
+        }
+    }
+
+    fn is_additive_operator(&self) -> bool {
+        if let Some(token) = &self.current {
+            matches!(token.kind, TokenKind::Plus | TokenKind::Minus)
+        } else {
+            false
+        }
+    }
+
+    fn is_relational_operator(&self) -> bool {
+        if let Some(token) = &self.current {
+            matches!(
+                token.kind,
+                TokenKind::LessThan
+                    | TokenKind::GreaterThan
+                    | TokenKind::LessThanEqual
+                    | TokenKind::GreaterThanEqual
+            )
+        } else {
+            false
+        }
+    }
+
+    fn is_assignment_operator(&self) -> bool {
+        if let Some(token) = &self.current {
+            matches!(
+                token.kind,
+                TokenKind::Arrow // TODO: add those when we implement them
+                                 // | TokenKind::PlusAssign | TokenKind::MinusAssign | TokenKind::Assign
+                                 // TokenKind::MultiplyAssign | TokenKind::DivideAssign | TokenKind::ModuloAssign |
+            )
+        } else {
+            false
+        }
+    }
+
+    fn is_equality_operator(&self) -> bool {
+        if let Some(token) = &self.current {
+            matches!(
+                token.kind,
+                TokenKind::EqualEqual | TokenKind::NotEqual // | TokenKind::StrictEqual | TokenKind::NotStrictEqual // TODO: implement
+            )
+        } else {
+            false
+        }
     }
 
     fn parse_primary_expression(&mut self) -> ParseResult<Node> {
@@ -276,6 +572,34 @@ impl Parser {
             matches!(token.kind, TokenKind::Identifier(_))
         } else {
             false
+        }
+    }
+
+    fn current_token_string(&self) -> String {
+        if let Some(token) = &self.current {
+            match &token.kind {
+                TokenKind::Plus => "+".to_string(),
+                TokenKind::Minus => "-".to_string(),
+                TokenKind::Star => "*".to_string(),
+                TokenKind::Slash => "/".to_string(),
+                TokenKind::Percent => "%".to_string(),
+                TokenKind::Equal => "=".to_string(),
+                TokenKind::EqualEqual => "==".to_string(),
+                TokenKind::LessThan => "<".to_string(),
+                TokenKind::GreaterThan => ">".to_string(),
+                TokenKind::LessThanEqual => "<=".to_string(),
+                TokenKind::GreaterThanEqual => ">=".to_string(),
+                TokenKind::Increment => "++".to_string(),
+                TokenKind::Decrement => "--".to_string(),
+                TokenKind::Identifier(name) => name.clone(),
+                TokenKind::String(s) => s.clone(),
+                TokenKind::Boolean(b) => b.to_string(),
+                TokenKind::Number(n) => n.to_string(),
+                TokenKind::Eof => "EOF".to_string(),
+                _ => format!("{:?}", token.kind), // Fallback for other token kinds
+            }
+        } else {
+            "EOF".to_string() // If no current token, return EOF
         }
     }
 

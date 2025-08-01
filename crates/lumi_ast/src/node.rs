@@ -63,6 +63,8 @@ pub enum Node {
     // Expressions
     BinaryExpression(BinaryExpression),
     UnaryExpression(UnaryExpression),
+    AssignmentExpression(AssignmentExpression),
+    LogicalExpression(LogicalExpression),
 
     // Statements
     PrintStatement(PrintStatement),
@@ -109,6 +111,22 @@ pub struct BinaryExpression {
     pub left: Box<Node>,
     pub operator: String,
     pub right: Box<Node>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct LogicalExpression {
+    pub left: Box<Node>,
+    pub operator: String, // "and", "or"
+    pub right: Box<Node>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AssignmentExpression {
+    pub left: Box<Node>,  // The left-hand side (e.g. x in x = 5)
+    pub operator: String, // The assignment operator (e.g. '=', '+=', etc.)
+    pub right: Box<Node>, // The right-hand side (e.g. 5 in x = 5)
     pub span: Option<Span>,
 }
 

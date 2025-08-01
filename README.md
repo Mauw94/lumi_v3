@@ -133,6 +133,11 @@ pub fn analyze(ast: &Node) -> Result<(), Vec<SemanticError>>
   - Instruction generation
   - Constant pool optimization
   - Expandable for custom instruction sets
+    - **Symbol table for variable management**
+    - Maps variable names to indices for efficient storage and lookup
+    - Ensures correct variable scoping and access during bytecode generation
+    - Automatically assigns indices to new variables and reuses them for subsequent references
+
 
 ```rust
 pub fn generate(ast: &Node) -> Bytecode

@@ -86,7 +86,8 @@ pub enum TokenKind {
     GreaterThanEqual,
 
     // Logical operators
-    // TODO: implement
+    LogicalAnd,
+    LogicalOr,
 
     // Increment/decrement operators
     Increment,
