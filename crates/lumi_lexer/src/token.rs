@@ -99,7 +99,6 @@ pub enum TokenKind {
     Star,
     Slash,
     Percent,
-    // Others? TODO: Synctatic sugeray stuff?
 }
 
 /// A token with position information
