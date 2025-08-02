@@ -149,8 +149,8 @@ impl SemanticAnalyzer {
             if let Some(var_type) = self.type_env.get_type(var_name) {
                 if *var_type != value_type {
                     self.errors.push(SemanticError::TypeMismatch {
-                        expected: value_type.to_string(),
-                        found: var_type.to_string(),
+                        expected: var_type.to_string(),
+                        found: value_type.to_string(),
                         position: expr.span.as_ref().map(|s| s.start.clone()),
                     });
                 }
@@ -165,21 +165,32 @@ impl SemanticAnalyzer {
         stmt: &node::ExpressionStatement,
     ) -> SemanticResult<Type> {
         match &*stmt.expression {
-            Node::Identifier(i) => self.vist_identifier(i, stmt.span.clone()),
+            Node::Identifier(i) => self.visit_identifier(i, stmt.span.clone()),
             Node::AssignmentExpression(expr) => self.visit_assignment_expression(expr),
             _ => Ok(Type::Undefined),
         }
     }
 
-    fn vist_identifier(&mut self, identifier: &String, span: Option<Span>) -> SemanticResult<Type> {
+    fn visit_identifier(
+        &mut self,
+        identifier: &String,
+        span: Option<Span>,
+    ) -> SemanticResult<Type> {
         let name = identifier.to_string();
-        if let Some(var_type) = self.type_env.get_type(&name) {
-            return Ok(var_type.clone());
-        } else {
+
+        let current_scope = self.scope_stack.last_mut().unwrap();
+
+        // If variable doesn't exist, return undeclared variable error
+        if !current_scope.is_variable_declared_in_current_scope(&name) {
             self.errors.push(SemanticError::UndeclaredVariable {
                 name,
                 position: span.as_ref().map(|s| s.start.clone()),
             });
+            return Ok(Type::Undefined);
+        }
+
+        if let Some(var_type) = self.type_env.get_type(&name) {
+            return Ok(var_type.clone());
         }
 
         Ok(Type::Undefined)
