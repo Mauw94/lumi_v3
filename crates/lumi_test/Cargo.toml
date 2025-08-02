@@ -1,0 +1,12 @@
+[package]
+name = "lumi_test"
+version = "0.1.0"
+edition = "2024"
+description = "Testing crate for the Lumi engine"
+license = "MIT"
+
+[dependencies]
+lumi_parser = { path = "../lumi_parser" }
+lumi_bytecode = { path = "../lumi_bytecode" }
+lumi_semantic = { path = "../lumi_semantic" }
+lumi_vm = { path = "../lumi_vm" }

@@ -31,7 +31,7 @@ fn test_type_mismatch_string_and_number() {
 
 #[test]
 fn test_declare_number_variable() {
-    let mut parser = Parser::new("let x: number -> 42;");
+    let mut parser = Parser::new("let x: int -> 42;");
     let ast = parser.parse().unwrap();
     let result = analyze(&ast);
     assert!(result.is_ok());

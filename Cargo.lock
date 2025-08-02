@@ -283,6 +283,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "lumi_test"
+version = "0.1.0"
+dependencies = [
+ "lumi_bytecode",
+ "lumi_parser",
+ "lumi_semantic",
+ "lumi_vm",
+]
+
+[[package]]
 name = "lumi_vm"
 version = "0.1.0"
 dependencies = [
