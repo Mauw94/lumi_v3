@@ -635,22 +635,18 @@ impl Parser {
 
     /// Gets the position of the current token
     fn current_position(&self) -> Option<Position> {
-        self.current
-            .as_ref()
-            .map(|t| Position {
-                line: t.start().line,
-                column: t.start().column,
-            })
+        self.current.as_ref().map(|t| Position {
+            line: t.start().line,
+            column: t.start().column,
+        })
     }
 
     /// Gets the previous token
     fn previous_position(&self) -> Option<Position> {
-        self.previous
-            .as_ref()
-            .map(|t| Position {
-                line: t.end().line,
-                column: t.end().column,
-            })
+        self.previous.as_ref().map(|t| Position {
+            line: t.end().line,
+            column: t.end().column,
+        })
     }
 
     /// Get the current token

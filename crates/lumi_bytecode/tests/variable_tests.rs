@@ -23,6 +23,3 @@ fn store_variable_test() {
     assert_eq!(bytecode.instructions.len(), 3); // Should have instructions for variable declaration and loading
     assert_eq!(bytecode.constants.len(), 1); // Should have one constant for the number 42
 }
-
-
-// TODO: do some benchmark tests

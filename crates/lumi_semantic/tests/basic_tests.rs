@@ -8,7 +8,10 @@ fn test_type_mismatch_number_and_string() {
     let result = analyze(&ast);
     assert!(result.is_err());
     if let Err(e) = result {
-        assert_eq!(e.to_string(), "Type mismatch: expected number, found string at line 1, column 27");
+        assert_eq!(
+            e.to_string(),
+            "Type mismatch: expected number, found string at line 1, column 27"
+        );
     }
 }
 
@@ -19,7 +22,10 @@ fn test_type_mismatch_string_and_number() {
     let result = analyze(&ast);
     assert!(result.is_err());
     if let Err(e) = result {
-        assert_eq!(e.to_string(), "Type mismatch: expected string, found number at line 1, column 22");
+        assert_eq!(
+            e.to_string(),
+            "Type mismatch: expected string, found number at line 1, column 22"
+        );
     }
 }
 

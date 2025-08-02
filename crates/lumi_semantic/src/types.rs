@@ -109,9 +109,16 @@ impl Type {
             Type::Symbol => "symbol".to_string(),
             Type::Object => "object".to_string(),
             Type::Array(inner) => format!("Array<{}>", inner.to_string()),
-            Type::Function { params, return_type } => {
+            Type::Function {
+                params,
+                return_type,
+            } => {
                 let params_str: Vec<String> = params.iter().map(|p| p.to_string()).collect();
-                format!("Function<({}) -> {}>", params_str.join(", "), return_type.to_string())
+                format!(
+                    "Function<({}) -> {}>",
+                    params_str.join(", "),
+                    return_type.to_string()
+                )
             }
             Type::Union(types) => {
                 let types_str: Vec<String> = types.iter().map(|t| t.to_string()).collect();
