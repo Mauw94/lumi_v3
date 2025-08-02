@@ -1,6 +1,11 @@
-use lumi_ast::{Node, node};
+use lumi_ast::{Node, Position, Span, node};
 
-use crate::{SemanticResult, analyzer, errors::SemanticError, scope::Scope, types::Type};
+use crate::{
+    SemanticResult, analyzer,
+    errors::SemanticError,
+    scope::Scope,
+    types::{Type, TypeEnvironment},
+};
 
 pub struct SemanticAnalyzer {
     /// Current scope being analyzed
@@ -8,6 +13,9 @@ pub struct SemanticAnalyzer {
 
     /// Collected semantic errors
     errors: Vec<SemanticError>,
+
+    /// Type environment for tracking variable types
+    type_env: TypeEnvironment,
 }
 
 impl SemanticAnalyzer {
@@ -16,6 +24,7 @@ impl SemanticAnalyzer {
         let mut analyzer = Self {
             scope_stack: Vec::new(),
             errors: Vec::new(),
+            type_env: TypeEnvironment::new(),
         };
 
         analyzer.scope_stack.push(Scope::new_global());
@@ -37,12 +46,14 @@ impl SemanticAnalyzer {
         match node {
             Node::Program(program) => self.visit_program(program),
             Node::VariableDeclaration(decl) => self.visit_variable_declaration(decl),
+            Node::ExpressionStatement(stmt) => self.visit_expression_statement(stmt),
+            Node::AssignmentExpression(expr) => self.visit_assignment_expression(expr),
             // Node::BinaryExpression(expr) => self.visit_binary_expression(expr),
             Node::String(_) => Ok(Type::String),
             Node::Boolean(_) => Ok(Type::Boolean),
             Node::Number(_) => Ok(Type::Number),
             // Node::Null => self.visit_null(),
-            // Node::Identifier(i) => self.visit_identifier(i),
+            // Node::Identifier(i) => self.vist_identifier(i),
             // Node::Undefined => self.visit_undefined(),
             _ => Ok(Type::Undefined), // Temporary
         }
@@ -66,18 +77,20 @@ impl SemanticAnalyzer {
                 // Get the type
                 let var_type = if let Some(var_type_node) = &var_decl.var_type {
                     // Get type from the type annotation
-                    let var_declared_type = self.fetch_variable_type(var_type_node, decl)?;
+                    let var_declared_type = self.get_type_from_annotation(var_type_node, decl)?;
                     // Check for mismatch between type annotation and initializer
                     if let Some(init) = &var_decl.init {
                         let init_type = self.visit_node(init)?;
                         if init_type != var_declared_type {
-                            return Err(SemanticError::TypeMismatch {
+                            self.errors.push(SemanticError::TypeMismatch {
                                 expected: var_declared_type.to_string(),
                                 found: init_type.to_string(),
                                 position: decl.span.as_ref().map(|s| s.start.clone()),
                             });
                         }
                     }
+                    // Declare the type in the type environment
+                    self.type_env.declare(var_name, var_declared_type.clone());
                     var_declared_type
                 } else if let Some(init) = &var_decl.init {
                     // Infer type from initializer
@@ -110,19 +123,56 @@ impl SemanticAnalyzer {
         Ok(Type::Undefined)
     }
 
-    // fn visit_identifier(&mut self, identifier: &node::Identifier) -> SemanticResult<Type> {
-    //     let current_scope = self.scope_stack.last().unwrap();
-    //     if let Some(var_type) = current_scope.get_variable_type(identifier) {
-    //         Ok(var_type.clone())
-    //     } else {
-    //         Err(SemanticError::UndeclaredVariable {
-    //             name: identifier.to_string(),
-    //             position: identifier.span.as_ref().map(|s| s.start.clone()),
-    //         })
-    //     }
-    // }
+    fn visit_assignment_expression(
+        &mut self,
+        expr: &node::AssignmentExpression,
+    ) -> SemanticResult<Type> {
+        let value_type = self.visit_node(&expr.right)?;
 
-    fn fetch_variable_type(
+        if let Node::Identifier(var_name) = &*expr.left {
+            let current_scope = self.scope_stack.last().unwrap();
+
+            if let Some(var_info) = current_scope.get_variable(var_name) {
+                if !var_info.mutable {
+                    self.errors.push(SemanticError::ConstReassignment {
+                        name: var_name.clone(),
+                        position: expr.span.as_ref().map(|s| s.start.clone()),
+                    });
+                }
+            } else {
+                self.errors.push(SemanticError::UndeclaredVariable {
+                    name: var_name.clone(),
+                    position: expr.span.as_ref().map(|s| s.start.clone()),
+                });
+            }
+        }
+
+        Ok(value_type)
+    }
+
+    fn visit_expression_statement(
+        &mut self,
+        stmt: &node::ExpressionStatement,
+    ) -> SemanticResult<Type> {
+        match &*stmt.expression {
+            Node::Identifier(i) => self.vist_identifier(i, stmt.span.clone()),
+            _ => Ok(Type::Undefined),
+        }
+    }
+
+    fn vist_identifier(&mut self, identifier: &String, span: Option<Span>) -> SemanticResult<Type> {
+        let name = identifier.to_string();
+        if let Some(var_type) = self.type_env.get_type(&name) {
+            Ok(var_type.clone())
+        } else {
+            Err(SemanticError::UndeclaredVariable {
+                name,
+                position: span.as_ref().map(|s| s.start.clone()),
+            })
+        }
+    }
+
+    fn get_type_from_annotation(
         &self,
         var_type: &Box<Node>,
         decl: &node::VariableDeclaration,

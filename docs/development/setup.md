@@ -28,6 +28,9 @@ cargo test --all -- --nocapture
 cargo test -p lumi_lexer
 cargo test -p lumi_parser
 cargo test -p lumi_vm
+
+# Run specific test
+cargo test 'name_of_function'
 ```
 
 ### 4. Run Benchmarks

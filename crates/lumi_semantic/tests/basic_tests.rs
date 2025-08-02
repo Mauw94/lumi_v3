@@ -30,7 +30,7 @@ fn test_type_mismatch_string_and_number() {
 }
 
 #[test]
-fn test_declare_number_varialble() {
+fn test_declare_number_variable() {
     let mut parser = Parser::new("let x: number -> 42;");
     let ast = parser.parse().unwrap();
     let result = analyze(&ast);
@@ -51,4 +51,20 @@ fn test_declare_boolean_variable() {
     let ast = parser.parse().unwrap();
     let result = analyze(&ast);
     assert!(result.is_ok());
+}
+
+#[test]
+fn test_get_undeclared_variable() {
+    let mut parser = Parser::new("let x -> 42; y;");
+    let ast = parser.parse().unwrap();
+    let result = analyze(&ast);
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_const_reassignment() {
+    let mut parser = Parser::new("const x -> 42; x = 2;");
+    let ast = parser.parse().unwrap();
+    let result = analyze(&ast);
+    assert!(result.is_err());
 }
