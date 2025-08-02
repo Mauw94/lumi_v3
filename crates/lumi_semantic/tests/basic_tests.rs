@@ -68,3 +68,11 @@ fn test_const_reassignment() {
     let result = analyze(&ast);
     assert!(result.is_err());
 }
+
+#[test]
+fn test_reassignment_with_different_type() {
+    let mut parser = Parser::new("let x: int -> 42; x = \"hello world\";");
+    let ast = parser.parse().unwrap();
+    let result = analyze(&ast);
+    assert!(result.is_err());
+}

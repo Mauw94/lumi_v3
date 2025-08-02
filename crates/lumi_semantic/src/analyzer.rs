@@ -145,6 +145,16 @@ impl SemanticAnalyzer {
                     position: expr.span.as_ref().map(|s| s.start.clone()),
                 });
             }
+
+            if let Some(var_type) = self.type_env.get_type(var_name) {
+                if *var_type != value_type {
+                    self.errors.push(SemanticError::TypeMismatch {
+                        expected: value_type.to_string(),
+                        found: var_type.to_string(),
+                        position: expr.span.as_ref().map(|s| s.start.clone()),
+                    });
+                }
+            }
         }
 
         Ok(value_type)
@@ -156,6 +166,7 @@ impl SemanticAnalyzer {
     ) -> SemanticResult<Type> {
         match &*stmt.expression {
             Node::Identifier(i) => self.vist_identifier(i, stmt.span.clone()),
+            Node::AssignmentExpression(expr) => self.visit_assignment_expression(expr),
             _ => Ok(Type::Undefined),
         }
     }
@@ -163,13 +174,15 @@ impl SemanticAnalyzer {
     fn vist_identifier(&mut self, identifier: &String, span: Option<Span>) -> SemanticResult<Type> {
         let name = identifier.to_string();
         if let Some(var_type) = self.type_env.get_type(&name) {
-            Ok(var_type.clone())
+            return Ok(var_type.clone());
         } else {
-            Err(SemanticError::UndeclaredVariable {
+            self.errors.push(SemanticError::UndeclaredVariable {
                 name,
                 position: span.as_ref().map(|s| s.start.clone()),
-            })
+            });
         }
+
+        Ok(Type::Undefined)
     }
 
     fn get_type_from_annotation(
