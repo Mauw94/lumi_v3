@@ -635,18 +635,22 @@ impl Parser {
 
     /// Gets the position of the current token
     fn current_position(&self) -> Option<Position> {
-        self.current.as_ref().map(|t| Position {
-            line: t.start().line,
-            column: t.start().column,
-        })
+        self.current
+            .as_ref()
+            .map(|t| Position {
+                line: t.start().line,
+                column: t.start().column,
+            })
     }
 
     /// Gets the previous token
     fn previous_position(&self) -> Option<Position> {
-        self.previous.as_ref().map(|t| Position {
-            line: t.end().line,
-            column: t.end().column,
-        })
+        self.previous
+            .as_ref()
+            .map(|t| Position {
+                line: t.end().line,
+                column: t.end().column,
+            })
     }
 
     /// Get the current token
@@ -654,7 +658,7 @@ impl Parser {
         self.current.as_ref()
     }
 
-    /// Create a span from the current and previous token positions
+    /// Create a span from the current tokens
     fn create_span_from_tokens(&self) -> Span {
         let start = self.previous_position().unwrap_or_default();
         let end = self.current_position().unwrap_or_default();

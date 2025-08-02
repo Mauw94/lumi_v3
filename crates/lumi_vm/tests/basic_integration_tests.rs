@@ -46,3 +46,5 @@ fn test_value_is_boolean() {
 
     assert_eq!(vm.stack.values, vec![Value::Boolean(true)]);
 }
+
+// TODO: do some benchmark tests

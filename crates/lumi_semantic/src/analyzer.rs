@@ -66,7 +66,19 @@ impl SemanticAnalyzer {
                 // Get the type
                 let var_type = if let Some(var_type_node) = &var_decl.var_type {
                     // Get type from the type annotation
-                    self.visit_node(var_type_node)?
+                    let var_declared_type = self.fetch_variable_type(var_type_node, decl)?;
+                    // Check for mismatch between type annotation and initializer
+                    if let Some(init) = &var_decl.init {
+                        let init_type = self.visit_node(init)?;
+                        if init_type != var_declared_type {
+                            return Err(SemanticError::TypeMismatch {
+                                expected: var_declared_type.to_string(),
+                                found: init_type.to_string(),
+                                position: decl.span.as_ref().map(|s| s.start.clone()),
+                            });
+                        }
+                    }
+                    var_declared_type
                 } else if let Some(init) = &var_decl.init {
                     // Infer type from initializer
                     self.visit_node(init)?
@@ -96,6 +108,45 @@ impl SemanticAnalyzer {
         }
 
         Ok(Type::Undefined)
+    }
+
+    // fn visit_identifier(&mut self, identifier: &node::Identifier) -> SemanticResult<Type> {
+    //     let current_scope = self.scope_stack.last().unwrap();
+    //     if let Some(var_type) = current_scope.get_variable_type(identifier) {
+    //         Ok(var_type.clone())
+    //     } else {
+    //         Err(SemanticError::UndeclaredVariable {
+    //             name: identifier.to_string(),
+    //             position: identifier.span.as_ref().map(|s| s.start.clone()),
+    //         })
+    //     }
+    // }
+
+    fn fetch_variable_type(
+        &self,
+        var_type: &Box<Node>,
+        decl: &node::VariableDeclaration,
+    ) -> SemanticResult<Type> {
+        return match &**var_type {
+            Node::Identifier(id) => match id.to_string().as_str() {
+                "int" => Ok(Type::Number),
+                // "float" => Some(Type::Float), // TODO: implement when adding float type
+                "str" => Ok(Type::String),
+                "boolean" => Ok(Type::Boolean),
+                // Add more types as needed
+                _ => Err(SemanticError::InvalidType {
+                    type_name: id.to_string(),
+                    position: decl.span.as_ref().map(|s| s.start.clone()),
+                }), // Handle unknown types
+            },
+            _ => {
+                // Handle complex types or type expressions
+                Err(SemanticError::InvalidType {
+                    type_name: format!("{:?}", var_type),
+                    position: decl.span.as_ref().map(|s| s.start.clone()),
+                })
+            }
+        };
     }
 
     /// Collect semantic errors found during analysis

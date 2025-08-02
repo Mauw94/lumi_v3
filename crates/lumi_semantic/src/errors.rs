@@ -29,6 +29,12 @@ pub enum SemanticError {
         position: Option<Position>,
     },
 
+    /// Type does not exist or is invalid
+    InvalidType {
+        type_name: String,
+        position: Option<Position>,
+    },
+
     /// Function is not declared
     UndeclaredFunction {
         name: String,
@@ -90,6 +96,16 @@ impl std::fmt::Display for SemanticError {
                 position,
             } => {
                 write!(f, "Type mismatch: expected {}, found {}", expected, found)?;
+                if let Some(pos) = position {
+                    write!(f, " at line {}, column {}", pos.line, pos.column)?;
+                }
+                Ok(())
+            }
+            SemanticError::InvalidType {
+                type_name,
+                position,
+            } => {
+                write!(f, "Invalid type '{}'", type_name)?;
                 if let Some(pos) = position {
                     write!(f, " at line {}, column {}", pos.line, pos.column)?;
                 }

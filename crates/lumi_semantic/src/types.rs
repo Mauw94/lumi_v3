@@ -98,6 +98,28 @@ impl Type {
     pub fn is_object(&self) -> bool {
         matches!(self, Type::Object | Type::Array(_) | Type::Function { .. })
     }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            Type::Undefined => "undefined".to_string(),
+            Type::Null => "null".to_string(),
+            Type::Boolean => "boolean".to_string(),
+            Type::Number => "number".to_string(),
+            Type::String => "string".to_string(),
+            Type::Symbol => "symbol".to_string(),
+            Type::Object => "object".to_string(),
+            Type::Array(inner) => format!("Array<{}>", inner.to_string()),
+            Type::Function { params, return_type } => {
+                let params_str: Vec<String> = params.iter().map(|p| p.to_string()).collect();
+                format!("Function<({}) -> {}>", params_str.join(", "), return_type.to_string())
+            }
+            Type::Union(types) => {
+                let types_str: Vec<String> = types.iter().map(|t| t.to_string()).collect();
+                types_str.join(" | ")
+            }
+            Type::Any => "any".to_string(),
+        }
+    }
 }
 
 impl Default for Type {

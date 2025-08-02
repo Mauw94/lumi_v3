@@ -90,7 +90,7 @@ impl Vm {
                                 panic!("Division by zero");
                             }
                             self.stack.push(Value::Number(a_num / b_num));
-                        }   
+                        }
                         // TODO: proper error handling
                         _ => panic!("Invalid types for division: {:?} and {:?}", a, b),
                     }
