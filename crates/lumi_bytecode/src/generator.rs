@@ -66,6 +66,25 @@ impl BytecodeGenerator {
             Node::ExpressionStatement(stmt) => {
                 self.visit_node(&stmt.expression);
             }
+            Node::AssignmentExpression(expr) => {
+                let var_name = match &*expr.left {
+                    Node::Identifier(id) => id.clone(),
+                    _ => unreachable!(), // TODO: should also give an informative error
+                };
+
+                // Pushes new constant value for the assignment and a value.
+                // TODO: remove unused constants by doing a compiler pass after byte code generation.
+                self.visit_node(&expr.right);
+
+                // TODO: finally implement bytecode error handinlg plz
+                // Naively expect the variable to exist. Need to handle errors here.
+                let idx = match self.symbol_table.get(&var_name) {
+                    Some(idx) => idx,
+                    None => todo!(), // Should throw error in byte code generation.
+                };
+
+                self.instructions.push(Instruction::StoreVar(*idx));
+            }
             Node::BinaryExpression(expr) => {
                 self.visit_node(&expr.left);
                 self.visit_node(&expr.right);

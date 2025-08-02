@@ -24,12 +24,12 @@ lumi_v3/
 │   ├── lumi_ast/         # Abstract Syntax Tree
 │   ├── lumi_parser/      # Syntax analysis
 │   ├── lumi_semantic/    # Semantic analysis
-│   ├── lumi_bytecode/    # Bytecode generation (TBD)
-│   ├── lumi_vm/          # Virtual Machine (TBD)
+│   ├── lumi_bytecode/    # Bytecode generation 
+│   ├── lumi_vm/          # Virtual Machine 
 │   ├── lumi_runtime/     # Runtime environment (TBD)
 │   ├── lumi_gc/          # Garbage collection (TBD)
 │   └── lumi_api/         # Public API (TBD)
-├── tests/                # Integration tests
+├── tests/                # Integration tests (TBD)
 ├── docs/                 # Design docs & specifications
 └── Cargo.toml            # Workspace configuration
 ```

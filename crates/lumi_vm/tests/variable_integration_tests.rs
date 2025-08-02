@@ -102,3 +102,50 @@ fn divide_two_number_variables() {
 
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // The result of x / y should be 42.0
 }
+
+#[test]
+fn test_reassigning_variables() {
+    let source = r#"
+        let x: int -> 42;
+        let y -> 2;
+        x -> 22;
+        y -> 3;
+        x * y;
+    "#;
+    let mut parser = Parser::new(source);
+    let ast = parser.parse().unwrap();
+
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode);
+
+    assert_eq!(vm.stack.values, vec![Value::Number(66.0)]); // The result of x * y should be 66.0
+}
+
+#[test]
+fn test_declaring_reassinging_variables() {
+    let source = r#"
+        let x: int -> 42;
+        let y -> 2;
+        x = 22;
+        y = 3;
+        let z: int -> 5;
+        z;
+        x + y;
+    "#;
+    let mut parser = Parser::new(source);
+    let ast = parser.parse().unwrap();
+
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode);
+
+    assert_eq!(
+        vm.stack.values,
+        vec![Value::Number(5.0), Value::Number(25.0)]
+    ); // The result of z and x + y should be 5.0 and 25.0
+}

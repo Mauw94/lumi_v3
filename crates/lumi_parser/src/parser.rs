@@ -485,9 +485,9 @@ impl Parser {
         if let Some(token) = &self.current {
             matches!(
                 token.kind,
-                TokenKind::Arrow // TODO: add those when we implement them
-                                 // | TokenKind::PlusAssign | TokenKind::MinusAssign | TokenKind::Assign
-                                 // TokenKind::MultiplyAssign | TokenKind::DivideAssign | TokenKind::ModuloAssign |
+                TokenKind::Arrow | TokenKind::Assign // TODO: add those when we implement them
+                                                     // | TokenKind::PlusAssign | TokenKind::MinusAssign
+                                                     // TokenKind::MultiplyAssign | TokenKind::DivideAssign | TokenKind::ModuloAssign |
             )
         } else {
             false
