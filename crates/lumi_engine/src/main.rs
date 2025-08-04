@@ -3,11 +3,6 @@ use std::io::{Write, stdin, stdout};
 use lumi_test::Engine;
 
 fn main() {
-    // let source = r#"
-    //     let x: int -> 42;
-    //     x = "hello world";
-    // "#;
-    // run(source);
     let engine = Engine::new();
     reply(&engine);
 }
@@ -25,9 +20,13 @@ fn prompt(input: &mut String) -> bool {
     }
 }
 
+// NOTE & TODO: right now there is no way to keep an environment alive for subsequent lines.
 fn reply(engine: &Engine) {
     let mut input = String::new();
     while prompt(&mut input) {
-        engine.evaluate(&input);
+        match engine.evaluate(&input) {
+            Ok(value) => println!("{:?}", value), // TODO: implement Display for Value
+            Err(e) => println!("{e}"),
+        }
     }
 }

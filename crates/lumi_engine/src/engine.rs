@@ -10,25 +10,18 @@ impl Engine {
         Self {}
     }
 
-    pub fn evaluate(&self, source: &str) -> Value {
+    pub fn evaluate(&self, source: &str) -> Result<Value, String> {
         let mut parser = Parser::new(source);
-        let ast = parser.parse().unwrap();
+        let ast = parser.parse().map_err(|e| format!("Parser error: {e}"))?;
 
-        let semantic_result = analyze(&ast);
-        match semantic_result {
-            Ok(_) => {
-                let mut bytecode_generator = BytecodeGenerator::new();
-                let bytecode = bytecode_generator.generate(&ast);
+        analyze(&ast).map_err(|e| format!("Semantic error: {e}"))?;
 
-                let mut vm = Vm::new();
-                vm.execute(&bytecode);
+        let mut bytecode_generator = BytecodeGenerator::new();
+        let bytecode = bytecode_generator.generate(&ast);
 
-                Value::Undefined
-            }
-            Err(e) => {
-                println!("{:?}", e);
-                Value::Null
-            }
-        }
+        let mut vm = Vm::new();
+        vm.execute(&bytecode);
+
+        Ok(vm.stack.pop().unwrap_or(Value::Undefined))
     }
 }
