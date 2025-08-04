@@ -1,6 +1,7 @@
 use lumi_ast::{
-    create_binary_expression, create_identifier, create_multiple_variable_declarations,
-    create_number, create_string, create_variable_declaration, Node, Position, Span,
+    create_binary_expression, create_block_statement, create_identifier, create_if_statement,
+    create_multiple_variable_declarations, create_number, create_string,
+    create_variable_declaration, Node, Position, Span,
 };
 
 #[test]
@@ -65,4 +66,13 @@ fn test_declaration_nodes() {
     assert!(
         matches!(multiple_declarations, Node::VariableDeclaration(decl) if decl.declarations.len() == 2)
     );
+}
+
+#[test]
+fn test_if_statement() {
+    let expr = create_identifier("condition");
+    let params = create_block_statement(vec![]);
+    let if_stmt = create_if_statement(expr, params, None);
+
+    assert!(matches!(if_stmt, Node::IfStatement(_)));
 }

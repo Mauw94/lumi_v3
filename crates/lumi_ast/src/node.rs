@@ -69,6 +69,8 @@ pub enum Node {
     // Statements
     PrintStatement(PrintStatement),
     ExpressionStatement(ExpressionStatement),
+    BlockStatement(BlockStatement),
+    IfStatement(IfStatement),
 
     // Literals
     ArrayLiteral(ArrayLiteral),
@@ -142,6 +144,20 @@ pub struct UnaryExpression {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PrintStatement {
     pub argument: Box<Option<Node>>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct BlockStatement {
+    pub body: Vec<Node>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct IfStatement {
+    pub expr: Box<Node>,
+    pub stmt: Box<Node>,
+    pub else_part: Option<Box<Node>>,
     pub span: Option<Span>,
 }
 

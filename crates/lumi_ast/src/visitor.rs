@@ -21,6 +21,8 @@ pub trait Visitor {
             Node::ExpressionStatement(_) => todo!(),
             Node::AssignmentExpression(_) => todo!(),
             Node::LogicalExpression(_) => todo!(),
+            Node::IfStatement(if_statement) => todo!(),
+            Node::BlockStatement(block_statement) => todo!(),
         }
     }
 

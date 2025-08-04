@@ -1,6 +1,7 @@
 use lumi_ast::{
-    AssignmentExpression, BinaryExpression, ExpressionStatement, LogicalExpression, Node, Position,
-    Program, Span, UnaryExpression, VariableDeclaration, VariableDeclarator,
+    AssignmentExpression, BinaryExpression, BlockStatement, ExpressionStatement, IfStatement,
+    LogicalExpression, Node, Position, Program, Span, UnaryExpression, VariableDeclaration,
+    VariableDeclarator,
 };
 use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
 
@@ -93,7 +94,7 @@ impl Parser {
             match &token.kind {
                 TokenKind::Keyword(kw) => match kw.as_str() {
                     "let" | "const" => self.parse_variable_declaration(),
-                    // "if" => self.parse_if_statement(),
+                    "if" => self.parse_if_statement(),
                     // "for" => self.parse_for_loop(),
                     // "while" => self.parse_while_loop(),
                     // _ => self.parse_expression_statement(),
@@ -103,6 +104,7 @@ impl Parser {
                         Ok(Node::Null)
                     }
                 },
+                TokenKind::LeftBrace => self.parse_block_statement(),
                 _ => self.parse_expression_statement(),
             }
         } else {
@@ -113,6 +115,70 @@ impl Parser {
         result
     }
 
+    fn parse_block_statement(&mut self) -> ParseResult<Node> {
+        self.advance(); // Consume '{'
+
+        let old_context = self.context.clone();
+        self.context = ParsingContext::Block;
+
+        let mut body = Vec::new();
+        while !self.check(TokenKind::RightBrace) && !self.is_eof() {
+            match self.parse_statement() {
+                Ok(stmt) => body.push(stmt),
+                Err(error) => {
+                    if !self.try_recover_from_error(error.clone()) {
+                        self.context = old_context;
+                        return Err(error);
+                    }
+                }
+            }
+        }
+
+        self.expect(TokenKind::RightBrace)?;
+
+        self.context = old_context;
+
+        let span = self.create_span_from_tokens();
+        Ok(Node::BlockStatement(BlockStatement {
+            body,
+            span: Some(span),
+        }))
+    }
+
+    /// Example if statement: if (x == 2) { } else { }
+    fn parse_if_statement(&mut self) -> ParseResult<Node> {
+        self.advance(); // Consume 'if'
+        self.expect(TokenKind::LeftParen)?;
+        let expr = Box::new(self.parse_expression()?);
+        self.expect(TokenKind::RightParen)?;
+
+        let stmt = Box::new(self.parse_statement()?);
+
+        let else_part = if let Some(token) = &self.current {
+            if let TokenKind::Keyword(kw) = &token.kind {
+                if kw == "else" {
+                    self.advance(); // Consume 'else'
+                    Some(Box::new(self.parse_statement()?))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        let span = self.create_span_from_tokens();
+        Ok(Node::IfStatement(IfStatement {
+            expr,
+            stmt,
+            else_part,
+            span: Some(span),
+        }))
+    }
+
+    /// Example varialbe declaration: let x: int -> 42;
     fn parse_variable_declaration(&mut self) -> ParseResult<Node> {
         let kind = if let Some(token) = &self.current {
             if let TokenKind::Keyword(kw) = &token.kind {
@@ -435,6 +501,23 @@ impl Parser {
         // }
 
         // Ok(expr)
+    }
+
+    fn expect(&mut self, token_kind: TokenKind) -> ParseResult<()> {
+        if self.check(token_kind.clone()) {
+            self.advance();
+            Ok(())
+        } else {
+            let _ = self
+                .current_token()
+                .map(|t| format!("{:?}", t.kind))
+                .unwrap_or_else(|| "EOF".to_string());
+            Err(ParserError::unexpected_token(
+                self.current_token()
+                    .unwrap_or_else(|| panic!("No current token")),
+                Some(&format!("{:?}", token_kind)),
+            ))
+        }
     }
 
     fn is_unary_operator(&self) -> bool {

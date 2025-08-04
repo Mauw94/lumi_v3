@@ -1,4 +1,7 @@
-use crate::{BinaryExpression, Node, Program, VariableDeclaration, VariableDeclarator};
+use crate::{
+    BinaryExpression, BlockStatement, IfStatement, Node, Program, VariableDeclaration,
+    VariableDeclarator,
+};
 
 // Helpers
 pub fn create_program(body: Vec<Node>) -> Node {
@@ -75,6 +78,19 @@ pub fn create_binary_expression(left: Node, operator: &str, right: Node) -> Node
         left: Box::new(left),
         operator: operator.to_string(),
         right: Box::new(right),
+        span: None,
+    })
+}
+
+pub fn create_block_statement(body: Vec<Node>) -> Node {
+    Node::BlockStatement(BlockStatement { body, span: None })
+}
+
+pub fn create_if_statement(expr: Node, stmt: Node, else_part: Option<Node>) -> Node {
+    Node::IfStatement(IfStatement {
+        expr: Box::new(expr),
+        stmt: Box::new(stmt),
+        else_part: else_part.map(Box::new),
         span: None,
     })
 }
