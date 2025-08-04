@@ -1,6 +1,6 @@
 use std::io::{Write, stdin, stdout};
 
-use lumi_test::run;
+use lumi_test::Engine;
 
 fn main() {
     // let source = r#"
@@ -8,7 +8,8 @@ fn main() {
     //     x = "hello world";
     // "#;
     // run(source);
-    reply();
+    let engine = Engine::new();
+    reply(&engine);
 }
 
 fn prompt(input: &mut String) -> bool {
@@ -24,9 +25,9 @@ fn prompt(input: &mut String) -> bool {
     }
 }
 
-fn reply() {
+fn reply(engine: &Engine) {
     let mut input = String::new();
     while prompt(&mut input) {
-        run(&input);
+        engine.evaluate(&input);
     }
 }
