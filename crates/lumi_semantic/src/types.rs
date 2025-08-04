@@ -66,6 +66,7 @@ impl Type {
                         .all(|(a, b)| a.is_compatible_with(b))
                     && r1.is_compatible_with(r2)
             }
+            (Type::Boolean, Type::Boolean) => true,
             _ => self == other,
         }
     }

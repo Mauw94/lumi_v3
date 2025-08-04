@@ -3,7 +3,7 @@ use lumi_ast::{Node, Position, Span, node};
 use crate::{
     SemanticResult, analyzer,
     errors::SemanticError,
-    scope::Scope,
+    scope::{Scope, ScopeType},
     types::{Type, TypeEnvironment},
 };
 
@@ -48,6 +48,8 @@ impl SemanticAnalyzer {
             Node::VariableDeclaration(decl) => self.visit_variable_declaration(decl),
             Node::ExpressionStatement(stmt) => self.visit_expression_statement(stmt),
             Node::AssignmentExpression(expr) => self.visit_assignment_expression(expr),
+            Node::IfStatement(stmt) => self.visit_if_statement(stmt),
+            Node::BlockStatement(stmt) => self.visit_block_statement(stmt),
             // Node::BinaryExpression(expr) => self.visit_binary_expression(expr),
             Node::String(_) => Ok(Type::String),
             Node::Boolean(_) => Ok(Type::Boolean),
@@ -169,6 +171,51 @@ impl SemanticAnalyzer {
             Node::AssignmentExpression(expr) => self.visit_assignment_expression(expr),
             _ => Ok(Type::Undefined),
         }
+    }
+
+    /// Visit if statement
+    fn visit_if_statement(&mut self, stmt: &node::IfStatement) -> SemanticResult<Type> {
+        let condition_type = self.visit_node(&stmt.expr)?;
+        if !condition_type.is_compatible_with(&Type::Boolean) {
+            self.errors.push(SemanticError::TypeMismatch {
+                expected: "boolean".to_string(),
+                found: format!("{:?}", condition_type),
+                position: stmt.span.as_ref().map(|s| s.start.clone()),
+            })
+        }
+
+        let current_scope = self.scope_stack.last().unwrap().clone();
+        let block_scope = Scope::new_child(current_scope, ScopeType::Block);
+        self.scope_stack.push(block_scope);
+        self.visit_node(&stmt.stmt)?;
+        self.scope_stack.pop();
+
+        if let Some(else_part) = &stmt.else_part {
+            let current_scope = self.scope_stack.last().unwrap().clone();
+            let block_scope = Scope::new_child(current_scope, ScopeType::Block);
+            self.scope_stack.push(block_scope);
+            self.visit_node(else_part)?;
+            self.scope_stack.pop();
+        }
+
+        Ok(Type::Undefined)
+    }
+
+    /// Visit block statement
+    fn visit_block_statement(&mut self, stmt: &node::BlockStatement) -> SemanticResult<Type> {
+        let current_scope = self.scope_stack.last().unwrap().clone();
+        let block_scope = Scope::new_child(current_scope, ScopeType::Block);
+        self.scope_stack.push(block_scope);
+
+        let mut last_type = Type::Undefined;
+
+        for statement in &stmt.body {
+            last_type = self.visit_node(statement)?;
+        }
+
+        self.scope_stack.pop();
+
+        Ok(last_type)
     }
 
     fn visit_identifier(
