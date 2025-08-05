@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
-use lumi_ast::{Node, VariableDeclarator};
+use lumi_ast::Node;
 
 use crate::{
+    expressions::{ArithmeticCore, ArithmeticGenerator, AssignmentCore, AssignmentGenerator},
     instruction::{Constant, ConstantPool, Instruction},
     scope::local_vars::{ScopeCore, ScopeManager},
     statements::variable::{VariableCore, VariableGenerator},
@@ -49,7 +50,7 @@ impl BytecodeGenerator {
             Node::VariableDeclaration(_decl) => {
                 <Self as VariableGenerator>::generate_variable_declaration(self, node);
             }
-            Node::IfStatement(stmt) => {}
+            Node::IfStatement(_stmt) => {}
             Node::PrintStatement(stmt) => {
                 self.visit_node(&stmt.argument);
                 self.instructions.push(Instruction::Print);
@@ -57,35 +58,11 @@ impl BytecodeGenerator {
             Node::ExpressionStatement(stmt) => {
                 self.visit_node(&stmt.expression);
             }
-            Node::AssignmentExpression(expr) => {
-                let var_name = match &*expr.left {
-                    Node::Identifier(id) => id.clone(),
-                    _ => unreachable!(), // TODO: should also give an informative error
-                };
-
-                // Pushes new constant value for the assignment and a value.
-                // TODO: remove unused constants by doing a compiler pass after byte code generation.
-                self.visit_node(&expr.right);
-
-                // TODO: finally implement bytecode error handinlg plz
-                // Naively expect the variable to exist. Need to handle errors here.
-                let idx = match self.symbol_table.get(&var_name) {
-                    Some(idx) => idx,
-                    None => todo!(), // Should throw error in byte code generation.
-                };
-
-                self.instructions.push(Instruction::StoreVar(*idx));
+            Node::AssignmentExpression(_expr) => {
+                <Self as AssignmentGenerator>::generate_assignment_expression(self, node)
             }
-            Node::BinaryExpression(expr) => {
-                self.visit_node(&expr.left);
-                self.visit_node(&expr.right);
-                match expr.operator.as_str() {
-                    "+" => self.instructions.push(Instruction::Add),
-                    "-" => self.instructions.push(Instruction::Sub),
-                    "*" => self.instructions.push(Instruction::Mul),
-                    "/" => self.instructions.push(Instruction::Div),
-                    _ => panic!("Unsupported operator: {}", expr.operator),
-                }
+            Node::BinaryExpression(_expr) => {
+                <Self as ArithmeticGenerator>::generate_binary_expression(self, node);
             }
             Node::Identifier(id) => {
                 if let Some(idx) = <Self as ScopeManager>::get_local(self, id) {
@@ -126,6 +103,26 @@ impl ScopeCore for BytecodeGenerator {
 
     fn set_next_local(&mut self, next: usize) {
         self.next_var_index = next;
+    }
+}
+
+impl AssignmentCore for BytecodeGenerator {
+    fn instructions(&mut self) -> &mut Vec<Instruction> {
+        &mut self.instructions
+    }
+
+    fn visit_node(&mut self, node: &Node) {
+        self.visit_node(node)
+    }
+}
+
+impl ArithmeticCore for BytecodeGenerator {
+    fn instructions(&mut self) -> &mut Vec<Instruction> {
+        &mut self.instructions
+    }
+
+    fn visit_node(&mut self, node: &Node) {
+        self.visit_node(node)
     }
 }
 

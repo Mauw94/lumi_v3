@@ -25,5 +25,18 @@ impl Value {
             None
         }
     }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            Value::Number(n) => n.to_string(),
+            Value::String(s) => s.clone(),
+            Value::Boolean(b) => b.to_string(),
+            Value::Object(_) => "[object]".to_string(),
+            Value::Array(_) => "[array]".to_string(),
+            Value::Function(_) => "[function]".to_string(),
+            Value::Null => "null".to_string(),
+            Value::Undefined => "undefined".to_string(),
+        }
+    }
     // TODO: add more methods for other types as needed
 }
