@@ -143,7 +143,7 @@ pub struct UnaryExpression {
 // Statements
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PrintStatement {
-    pub argument: Box<Option<Node>>,
+    pub argument: Box<Node>,
     pub span: Option<Span>,
 }
 

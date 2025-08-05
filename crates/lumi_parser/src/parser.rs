@@ -1,7 +1,7 @@
 use lumi_ast::{
     AssignmentExpression, BinaryExpression, BlockStatement, ExpressionStatement, IfStatement,
-    LogicalExpression, Node, Position, Program, Span, UnaryExpression, VariableDeclaration,
-    VariableDeclarator,
+    LogicalExpression, Node, Position, PrintStatement, Program, Span, UnaryExpression,
+    VariableDeclaration, VariableDeclarator,
 };
 use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
 
@@ -95,6 +95,7 @@ impl Parser {
                 TokenKind::Keyword(kw) => match kw.as_str() {
                     "let" | "const" => self.parse_variable_declaration(),
                     "if" => self.parse_if_statement(),
+                    "print" => self.parse_print_statement(),
                     // "for" => self.parse_for_loop(),
                     // "while" => self.parse_while_loop(),
                     // _ => self.parse_expression_statement(),
@@ -141,6 +142,18 @@ impl Parser {
         let span = self.create_span_from_tokens();
         Ok(Node::BlockStatement(BlockStatement {
             body,
+            span: Some(span),
+        }))
+    }
+
+    /// Parse print statement
+    fn parse_print_statement(&mut self) -> ParseResult<Node> {
+        self.advance(); // Consume 'print'
+        let expr = self.parse_expression()?;
+
+        let span = self.create_span_from_tokens();
+        Ok(Node::PrintStatement(PrintStatement {
+            argument: Box::new(expr),
             span: Some(span),
         }))
     }

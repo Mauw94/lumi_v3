@@ -23,6 +23,10 @@ impl Stack {
         self.values.pop()
     }
 
+    pub fn peek(&self) -> Option<&Value> {
+        self.values.last()
+    }
+
     pub fn push_frame(&mut self, frame: Frame) {
         self.frames.push(frame);
     }

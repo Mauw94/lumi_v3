@@ -113,6 +113,10 @@ impl Vm {
                         panic!("Variable index out of bounds: {}", index);
                     }
                 }
+                Instruction::Print => {
+                    let value = self.stack.peek().unwrap();
+                    println!("{:?}", value);
+                }
                 _ => unimplemented!(), // Placeholder for other instructions
             }
 

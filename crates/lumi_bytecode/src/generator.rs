@@ -63,6 +63,11 @@ impl BytecodeGenerator {
                     }
                 }
             }
+            Node::IfStatement(stmt) => {}
+            Node::PrintStatement(stmt) => {
+                self.visit_node(&stmt.argument);
+                self.instructions.push(Instruction::Print);
+            }
             Node::ExpressionStatement(stmt) => {
                 self.visit_node(&stmt.expression);
             }
