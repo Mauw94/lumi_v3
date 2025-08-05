@@ -133,6 +133,24 @@ impl Vm {
                         self.stack.push(Value::Boolean(false));
                     }
                 }
+                Instruction::JumpIfTrue(target) => {
+                    let cond = self.stack.pop().unwrap();
+                    if cond.as_bool().unwrap_or(false) {
+                        ip = *target;
+                        continue;
+                    }
+                }
+                Instruction::JumpIfFalse(target) => {
+                    let cond = self.stack.pop().unwrap();
+                    if !cond.as_bool().unwrap_or(false) {
+                        ip = *target;
+                        continue;
+                    }
+                }
+                Instruction::Jump(target) => {
+                    ip = *target;
+                    continue;
+                }
                 Instruction::Pop => {
                     self.stack.pop();
                 }

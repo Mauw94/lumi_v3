@@ -26,6 +26,14 @@ impl Value {
         }
     }
 
+    pub fn as_bool(&self) -> Option<bool> {
+        if let Value::Boolean(b) = self {
+            Some(*b)
+        } else {
+            None
+        }
+    }
+
     pub fn to_string(&self) -> String {
         match self {
             Value::Number(n) => n.to_string(),

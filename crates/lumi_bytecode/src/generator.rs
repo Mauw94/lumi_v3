@@ -6,7 +6,10 @@ use crate::{
     expressions::{ArithmeticCore, ArithmeticGenerator, AssignmentCore, AssignmentGenerator},
     instruction::{Constant, ConstantPool, Instruction},
     scope::local_vars::{ScopeCore, ScopeManager},
-    statements::variable::{VariableCore, VariableGenerator},
+    statements::{
+        control_flow::{ControlFlowCore, ControlFlowGenerator},
+        variable::{VariableCore, VariableGenerator},
+    },
 };
 
 pub struct Bytecode {
@@ -50,7 +53,14 @@ impl BytecodeGenerator {
             Node::VariableDeclaration(_decl) => {
                 <Self as VariableGenerator>::generate_variable_declaration(self, node);
             }
-            Node::IfStatement(_stmt) => {}
+            Node::IfStatement(_stmt) => {
+                <Self as ControlFlowGenerator>::generate_if_statement(self, node);
+            }
+            Node::BlockStatement(block) => {
+                for stmt in &block.body {
+                    self.visit_node(&stmt);
+                }
+            }
             Node::PrintStatement(stmt) => {
                 self.visit_node(&stmt.argument);
                 self.instructions.push(Instruction::Print);
@@ -127,6 +137,16 @@ impl ArithmeticCore for BytecodeGenerator {
 }
 
 impl VariableCore for BytecodeGenerator {
+    fn instructions(&mut self) -> &mut Vec<Instruction> {
+        &mut self.instructions
+    }
+
+    fn visit_node(&mut self, node: &Node) {
+        self.visit_node(node)
+    }
+}
+
+impl ControlFlowCore for BytecodeGenerator {
     fn instructions(&mut self) -> &mut Vec<Instruction> {
         &mut self.instructions
     }

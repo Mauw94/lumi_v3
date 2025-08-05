@@ -149,11 +149,16 @@ impl Parser {
     /// Parse print statement
     fn parse_print_statement(&mut self) -> ParseResult<Node> {
         self.advance(); // Consume 'print'
-        let expr = self.parse_expression()?;
+
+        let expr = Box::new(self.parse_expression()?);
+
+        if self.check(TokenKind::Semicolon) {
+            self.advance(); // consume the semicolon
+        }
 
         let span = self.create_span_from_tokens();
         Ok(Node::PrintStatement(PrintStatement {
-            argument: Box::new(expr),
+            argument: expr,
             span: Some(span),
         }))
     }
