@@ -1,5 +1,7 @@
 mod generator;
 mod instruction;
+mod scope;
+mod statements;
 
 pub use generator::Bytecode;
 pub use generator::BytecodeGenerator;

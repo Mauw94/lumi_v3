@@ -1,8 +1,12 @@
 use std::collections::HashMap;
 
-use lumi_ast::Node;
+use lumi_ast::{Node, VariableDeclarator};
 
-use crate::instruction::{Constant, ConstantPool, Instruction};
+use crate::{
+    instruction::{Constant, ConstantPool, Instruction},
+    scope::local_vars::{ScopeCore, ScopeManager},
+    statements::variable::{VariableCore, VariableGenerator},
+};
 
 pub struct Bytecode {
     pub instructions: Vec<Instruction>,
@@ -42,26 +46,8 @@ impl BytecodeGenerator {
                     self.visit_node(stmt);
                 }
             }
-            Node::VariableDeclaration(decl) => {
-                for var in &decl.declarations {
-                    // Assign index if not already present
-                    let var_name = match &*var.id {
-                        Node::Identifier(id) => id.clone(),
-                        _ => continue,
-                    };
-                    let idx = *self
-                        .symbol_table
-                        .entry(var_name.clone())
-                        .or_insert_with(|| {
-                            let i = self.next_var_index;
-                            self.next_var_index += 1;
-                            i
-                        });
-                    if let Some(init) = &var.init {
-                        self.visit_node(init);
-                        self.instructions.push(Instruction::StoreVar(idx));
-                    }
-                }
+            Node::VariableDeclaration(_decl) => {
+                <Self as VariableGenerator>::generate_variable_declaration(self, node);
             }
             Node::IfStatement(stmt) => {}
             Node::PrintStatement(stmt) => {
@@ -102,11 +88,9 @@ impl BytecodeGenerator {
                 }
             }
             Node::Identifier(id) => {
-                if let Some(idx) = self.symbol_table.get(id) {
+                if let Some(idx) = <Self as ScopeManager>::get_local(self, id) {
                     self.instructions.push(Instruction::LoadVar(*idx));
                 } else {
-                    // TODO: need proper error handling here
-                    panic!("Undefined variable: {}", id);
                 }
             }
             Node::Number(num) => {
@@ -124,5 +108,33 @@ impl BytecodeGenerator {
             // Handle other node types...
             _ => {}
         }
+    }
+}
+
+impl ScopeCore for BytecodeGenerator {
+    fn local_vars(&self) -> &HashMap<String, usize> {
+        &self.symbol_table
+    }
+
+    fn local_vars_mut(&mut self) -> &mut HashMap<String, usize> {
+        &mut self.symbol_table
+    }
+
+    fn next_local(&self) -> usize {
+        self.next_var_index
+    }
+
+    fn set_next_local(&mut self, next: usize) {
+        self.next_var_index = next;
+    }
+}
+
+impl VariableCore for BytecodeGenerator {
+    fn instructions(&mut self) -> &mut Vec<Instruction> {
+        &mut self.instructions
+    }
+
+    fn visit_node(&mut self, node: &Node) {
+        self.visit_node(node)
     }
 }
