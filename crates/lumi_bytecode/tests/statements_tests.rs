@@ -13,6 +13,17 @@ fn test_print_statement() {
 }
 
 #[test]
+fn test_simple_print_statement() {
+    let mut parser = Parser::new("print 1 + 2;");
+    let ast = parser.parse().unwrap();
+
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    assert_eq!(bytecode.constants, vec![Constant::Number(1.0), Constant::Number(2.0)]);
+}
+
+#[test]
 fn test_if_statement() {
     let mut parser = Parser::new(
         r#"
