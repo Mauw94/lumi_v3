@@ -38,3 +38,19 @@ fn test_if_statement() {
         ]
     );
 }
+
+#[test]
+fn test_fn_statement() {
+    let mut parser = Parser::new(
+        r#"
+        fn test(x, y) {
+            x + y;
+        }
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    assert_eq!(bytecode.constants, vec![]);
+}

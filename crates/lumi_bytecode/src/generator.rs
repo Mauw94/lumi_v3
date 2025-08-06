@@ -8,6 +8,7 @@ use crate::{
     scope::local_vars::{ScopeCore, ScopeManager},
     statements::{
         control_flow::{ControlFlowCore, ControlFlowGenerator},
+        function::{FunctionCore, FunctionGenerator},
         variable::{VariableCore, VariableGenerator},
     },
 };
@@ -57,6 +58,9 @@ impl BytecodeGenerator {
             Node::VariableDeclaration(_decl) => {
                 <Self as VariableGenerator>::generate_variable_declaration(self, node);
             }
+            Node::FunctionDeclaration(_fn) => {
+                <Self as FunctionGenerator>::generate_function_declaration(self, node);
+            }
             Node::IfStatement(_stmt) => {
                 <Self as ControlFlowGenerator>::generate_if_statement(self, node);
             }
@@ -77,6 +81,9 @@ impl BytecodeGenerator {
             }
             Node::BinaryExpression(_expr) => {
                 <Self as ArithmeticGenerator>::generate_binary_expression(self, node);
+            }
+            Node::CallExpression(_expr) => {
+                <Self as AssignmentGenerator>::generate_call_expression(self, node);
             }
             Node::Identifier(id) => {
                 if let Some(idx) = <Self as ScopeManager>::get_local(self, id) {
@@ -141,6 +148,16 @@ impl ArithmeticCore for BytecodeGenerator {
 }
 
 impl VariableCore for BytecodeGenerator {
+    fn instructions(&mut self) -> &mut Vec<Instruction> {
+        &mut self.instructions
+    }
+
+    fn visit_node(&mut self, node: &Node) {
+        self.visit_node(node)
+    }
+}
+
+impl FunctionCore for BytecodeGenerator {
     fn instructions(&mut self) -> &mut Vec<Instruction> {
         &mut self.instructions
     }
