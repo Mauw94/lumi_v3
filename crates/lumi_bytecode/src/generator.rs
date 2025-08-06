@@ -4,7 +4,7 @@ use lumi_ast::Node;
 
 use crate::{
     expressions::{ArithmeticCore, ArithmeticGenerator, AssignmentCore, AssignmentGenerator},
-    instruction::{Constant, ConstantPool, Instruction},
+    instruction::{Constant, ConstantPool, Instruction, Label, PendingJump},
     scope::local_vars::{ScopeCore, ScopeManager},
     statements::{
         control_flow::{ControlFlowCore, ControlFlowGenerator},
@@ -21,8 +21,10 @@ pub struct Bytecode {
 pub struct BytecodeGenerator {
     pub constants: ConstantPool,
     pub instructions: Vec<Instruction>,
+    pub label_positions: HashMap<Label, usize>,
+    pub unpatched_jumps: HashMap<Label, Vec<PendingJump>>,
     pub symbol_table: HashMap<String, usize>, // Maps variable names to their indices
-    pub next_var_index: usize,                // Index for the next variable to be added
+    pub next_label_id: usize,                 // Index for the next variable to be added
 }
 
 impl BytecodeGenerator {
@@ -30,8 +32,10 @@ impl BytecodeGenerator {
         BytecodeGenerator {
             constants: ConstantPool::default(),
             instructions: Vec::new(),
+            label_positions: HashMap::new(),
+            unpatched_jumps: HashMap::new(),
             symbol_table: HashMap::new(),
-            next_var_index: 0,
+            next_label_id: 0,
         }
     }
 
@@ -108,11 +112,11 @@ impl ScopeCore for BytecodeGenerator {
     }
 
     fn next_local(&self) -> usize {
-        self.next_var_index
+        self.next_label_id
     }
 
     fn set_next_local(&mut self, next: usize) {
-        self.next_var_index = next;
+        self.next_label_id = next;
     }
 }
 
@@ -153,5 +157,56 @@ impl ControlFlowCore for BytecodeGenerator {
 
     fn visit_node(&mut self, node: &Node) {
         self.visit_node(node)
+    }
+
+    /// Create a new label
+    fn new_label(&mut self) -> Label {
+        let label = Label(self.next_label_id);
+        self.next_label_id += 1;
+        label
+    }
+
+    /// Patch all unpatched_jump instructions with their correct indices.
+    fn patch_label(&mut self, label: Label) {
+        let position = self.instructions.len();
+        self.label_positions.insert(label, position);
+
+        if let Some(jumps) = self.unpatched_jumps.remove(&label) {
+            for jump in jumps {
+                match jump {
+                    PendingJump::Jump(pos) => self.instructions[pos] = Instruction::Jump(position),
+                    PendingJump::JumpIfFalse(pos) => {
+                        self.instructions[pos] = Instruction::JumpIfFalse(position)
+                    }
+                }
+            }
+        }
+    }
+
+    /// Emit a Jump instruction and push to unpatched_jumps
+    fn emit_jump(&mut self, label: Label) {
+        let pos = self.instructions.len();
+        self.instructions.push(Instruction::Jump(0)); // placeholder
+        
+        self.unpatched_jumps
+            .entry(label)
+            .or_default()
+            .push(PendingJump::Jump(pos));
+    }
+
+    /// Emit a JumpIfFalse instruction and push to unpatched_jumps
+    fn emit_jump_if_false(&mut self, label: Label) {
+        let pos = self.instructions.len();
+        self.instructions.push(Instruction::JumpIfFalse(0)); // placeholder
+
+        self.unpatched_jumps
+            .entry(label)
+            .or_default()
+            .push(PendingJump::JumpIfFalse(pos));
+    }
+
+    /// Emit an instruction
+    fn emit(&mut self, instr: Instruction) {
+        self.instructions.push(instr);
     }
 }

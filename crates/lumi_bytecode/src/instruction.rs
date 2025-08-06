@@ -1,3 +1,12 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Label(pub usize);
+
+#[derive(Debug)]
+pub enum PendingJump {
+    Jump(usize),
+    JumpIfFalse(usize),
+}
+
 /// This module defines the bytecode instructions for the Lumi engine.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Instruction {
