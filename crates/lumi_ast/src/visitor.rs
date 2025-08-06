@@ -23,6 +23,8 @@ pub trait Visitor {
             Node::LogicalExpression(_) => todo!(),
             Node::IfStatement(if_statement) => todo!(),
             Node::BlockStatement(block_statement) => todo!(),
+            Node::FunctionDeclaration(function_declaration) => todo!(),
+            Node::CallExpression(call_expression) => todo!(),
         }
     }
 

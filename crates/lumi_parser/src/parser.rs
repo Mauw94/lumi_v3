@@ -1,7 +1,7 @@
 use lumi_ast::{
-    AssignmentExpression, BinaryExpression, BlockStatement, ExpressionStatement, IfStatement,
-    LogicalExpression, Node, Position, PrintStatement, Program, Span, UnaryExpression,
-    VariableDeclaration, VariableDeclarator,
+    AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ExpressionStatement,
+    FunctionDeclaration, IfStatement, LogicalExpression, Node, Position, PrintStatement, Program,
+    Span, UnaryExpression, VariableDeclaration, VariableDeclarator,
 };
 use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
 
@@ -96,6 +96,7 @@ impl Parser {
                     "let" | "const" => self.parse_variable_declaration(),
                     "if" => self.parse_if_statement(),
                     "print" => self.parse_print_statement(),
+                    "fn" => self.parse_function_statement(),
                     // "for" => self.parse_for_loop(),
                     // "while" => self.parse_while_loop(),
                     // _ => self.parse_expression_statement(),
@@ -144,6 +145,64 @@ impl Parser {
             body,
             span: Some(span),
         }))
+    }
+
+    /// Parse function statement
+    fn parse_function_statement(&mut self) -> ParseResult<Node> {
+        self.advance(); // consume 'fn'
+
+        let id = if self.check_idenfitier() {
+            Some(Box::new(self.parse_identifier()?))
+        } else {
+            None
+        };
+
+        self.expect(TokenKind::LeftParen)?;
+        let params = self.parse_parameters()?;
+        self.expect(TokenKind::RightParen)?;
+
+        let body = Box::new(self.parse_function_body()?);
+
+        let span = self.create_span_from_tokens();
+        Ok(Node::FunctionDeclaration(FunctionDeclaration {
+            id,
+            params,
+            body,
+            is_async: false,
+            span: Some(span),
+        }))
+    }
+
+    fn parse_parameters(&mut self) -> ParseResult<Vec<Node>> {
+        let mut params = Vec::new();
+
+        while !self.check(TokenKind::RightParen) && !self.is_eof() {
+            params.push(self.parse_identifier()?);
+
+            if self.check(TokenKind::Comma) {
+                self.advance();
+            }
+        }
+
+        Ok(params)
+    }
+
+    fn parse_arguments(&mut self) -> ParseResult<Vec<Node>> {
+        let mut arguments = Vec::new();
+
+        while !self.check(TokenKind::RightParen) && !self.is_eof() {
+            arguments.push(self.parse_expression()?);
+
+            if self.check(TokenKind::Comma) {
+                self.advance();
+            }
+        }
+
+        Ok(arguments)
+    }
+
+    fn parse_function_body(&mut self) -> ParseResult<Node> {
+        self.parse_block_statement()
     }
 
     /// Parse print statement
@@ -448,77 +507,73 @@ impl Parser {
     }
 
     fn parse_postfix_expression(&mut self) -> ParseResult<Node> {
-        self.parse_primary_expression()
-        // let mut expr = self.parse_primary_expression()?;
+        let mut expr = self.parse_primary_expression()?;
 
-        // TODO: add later
-        //   loop {
-        //     if let Some(token) = &self.current {
-        //         match &token.kind {
-        //             TokenKind::LeftBracket => {
-        //                 self.advance(); // Consume '['
-        //                 let property = Box::new(self.parse_expression()?);
-        //                 self.expect(TokenKind::RightBracket)?;
+        loop {
+            if let Some(token) = &self.current {
+                match &token.kind {
+                    // TokenKind::LeftBracket => {
+                    //     self.advance(); // Consume '['
+                    //     let property = Box::new(self.parse_expression()?);
+                    //     self.expect(TokenKind::RightBracket)?;
 
-        //                 let span = self.create_span_from_tokens();
-        //                 expr = Node::MemberExpression(MemberExpression {
-        //                     object: Box::new(expr),
-        //                     property,
-        //                     computed: true,
-        //                     optional: false,
-        //                     span: Some(span),
-        //                 });
-        //             }
+                    //     let span = self.create_span_from_tokens();
+                    //     expr = Node::MemberExpression(MemberExpression {
+                    //         object: Box::new(expr),
+                    //         property,
+                    //         computed: true,
+                    //         optional: false,
+                    //         span: Some(span),
+                    //     });
+                    // }
 
-        //             TokenKind::Dot => {
-        //                 self.advance(); // Consume '.'
-        //                 let property = Box::new(self.parse_identifier()?);
+                    // TokenKind::Dot => {
+                    //     self.advance(); // Consume '.'
+                    //     let property = Box::new(self.parse_identifier()?);
 
-        //                 let span = self.create_span_from_tokens();
-        //                 expr = Node::MemberExpression(MemberExpression {
-        //                     object: Box::new(expr),
-        //                     property,
-        //                     computed: false,
-        //                     optional: false,
-        //                     span: Some(span),
-        //                 });
-        //             }
+                    //     let span = self.create_span_from_tokens();
+                    //     expr = Node::MemberExpression(MemberExpression {
+                    //         object: Box::new(expr),
+                    //         property,
+                    //         computed: false,
+                    //         optional: false,
+                    //         span: Some(span),
+                    //     });
+                    // }
+                    TokenKind::LeftParen => {
+                        self.advance(); // Consume '('
+                        let arguments = self.parse_arguments()?;
+                        self.expect(TokenKind::RightParen)?;
 
-        //             TokenKind::LeftParen => {
-        //                 self.advance(); // Consume '('
-        //                 let arguments = self.parse_arguments()?;
-        //                 self.expect(TokenKind::RightParen)?;
+                        let span = self.create_span_from_tokens();
+                        expr = Node::CallExpression(CallExpression {
+                            callee: Box::new(expr),
+                            arguments,
+                            span: Some(span),
+                        });
+                    }
 
-        //                 let span = self.create_span_from_tokens();
-        //                 expr = Node::CallExpression(CallExpression {
-        //                     callee: Box::new(expr),
-        //                     arguments,
-        //                     span: Some(span),
-        //                 });
-        //             }
+                    // TokenKind::Increment | TokenKind::Decrement => {
+                    //     let operator = self.current_token_string();
+                    //     let prefix = false;
+                    //     self.advance(); // Consume operator
 
-        //             TokenKind::Increment | TokenKind::Decrement => {
-        //                 let operator = self.current_token_string();
-        //                 let prefix = false;
-        //                 self.advance(); // Consume operator
+                    //     let span = self.create_span_from_tokens();
+                    //     expr = Node::UpdateExpression(UpdateExpression {
+                    //         operator,
+                    //         argument: Box::new(expr),
+                    //         prefix,
+                    //         span: Some(span),
+                    //     });
+                    // }
+                    _ => break,
+                }
+            } else {
+                break;
+            }
+        }
 
-        //                 let span = self.create_span_from_tokens();
-        //                 expr = Node::UpdateExpression(UpdateExpression {
-        //                     operator,
-        //                     argument: Box::new(expr),
-        //                     prefix,
-        //                     span: Some(span),
-        //                 });
-        //             }
-
-        //             _ => break,
-        //         }
-        //     } else {
-        //         break;
-        //     }
-        // }
-
-        // Ok(expr)
+        Ok(expr)
     }
 
     fn expect(&mut self, token_kind: TokenKind) -> ParseResult<()> {

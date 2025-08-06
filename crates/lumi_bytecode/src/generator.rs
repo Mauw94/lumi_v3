@@ -187,7 +187,7 @@ impl ControlFlowCore for BytecodeGenerator {
     fn emit_jump(&mut self, label: Label) {
         let pos = self.instructions.len();
         self.instructions.push(Instruction::Jump(0)); // placeholder
-        
+
         self.unpatched_jumps
             .entry(label)
             .or_default()

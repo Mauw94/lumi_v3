@@ -59,12 +59,14 @@ pub enum Node {
 
     // Declarations
     VariableDeclaration(VariableDeclaration),
+    FunctionDeclaration(FunctionDeclaration),
 
     // Expressions
     BinaryExpression(BinaryExpression),
     UnaryExpression(UnaryExpression),
     AssignmentExpression(AssignmentExpression),
     LogicalExpression(LogicalExpression),
+    CallExpression(CallExpression),
 
     // Statements
     PrintStatement(PrintStatement),
@@ -100,11 +102,27 @@ pub struct VariableDeclaration {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FunctionDeclaration {
+    pub id: Option<Box<Node>>,
+    pub params: Vec<Node>,
+    pub body: Box<Node>,
+    pub is_async: bool,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VariableDeclarator {
     pub id: Box<Node>,
     pub var_type: Option<Box<Node>>, // Optional type annotation
     pub init: Option<Box<Node>>, // The initializer expression (e.g. 5) - can be None if the variable is declared but not initialized.
     pub span: Option<Span>,      // Span of the declarator
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CallExpression {
+    pub callee: Box<Node>,
+    pub arguments: Vec<Node>,
+    pub span: Option<Span>,
 }
 
 // Expressions
