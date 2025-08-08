@@ -1,9 +1,11 @@
+mod core;
 mod expressions;
 mod generator;
 mod instruction;
 mod scope;
 mod statements;
 
+pub use core::*;
 pub use generator::Bytecode;
 pub use generator::BytecodeGenerator;
 pub use instruction::{Constant, ConstantPool, Instruction};

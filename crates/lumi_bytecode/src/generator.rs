@@ -89,6 +89,7 @@ impl BytecodeGenerator {
                 if let Some(idx) = <Self as ScopeManager>::get_local(self, id) {
                     self.instructions.push(Instruction::LoadVar(*idx));
                 } else {
+                    <Self as ScopeManager>::get_or_create_local(self, &id.to_string());
                 }
             }
             Node::Number(num) => {
@@ -164,6 +165,10 @@ impl FunctionCore for BytecodeGenerator {
 
     fn visit_node(&mut self, node: &Node) {
         self.visit_node(node)
+    }
+
+    fn constants(&mut self) -> &mut ConstantPool {
+        &mut self.constants
     }
 }
 

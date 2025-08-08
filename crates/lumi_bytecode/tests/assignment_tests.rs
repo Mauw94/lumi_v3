@@ -1,7 +1,6 @@
-use lumi_bytecode::BytecodeGenerator;
+use lumi_bytecode::{BytecodeGenerator, Constant, FunctionObj, Instruction};
 use lumi_parser::Parser;
 
-// NOTE: doesn't work yet
 #[test]
 fn test_call_expression() {
     let mut parser = Parser::new(
@@ -17,6 +16,22 @@ fn test_call_expression() {
     let mut bytecode_generator = BytecodeGenerator::new();
     let bytecode = bytecode_generator.generate(&ast);
 
-    println!("{:?}", bytecode.instructions);
-    // assert_eq!(bytecode.constants, vec![]);
+    assert_eq!(
+        bytecode.constants,
+        vec![
+            Constant::Function(FunctionObj {
+                name: None,
+                arity: 2,
+                chunk: vec![
+                    Instruction::LoadVar(0),
+                    Instruction::LoadVar(1),
+                    Instruction::Add,
+                    Instruction::Return
+                ],
+                constants: vec![]
+            }),
+            Constant::Number(1.0),
+            Constant::Number(2.0)
+        ]
+    );
 }

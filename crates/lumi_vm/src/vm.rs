@@ -25,10 +25,10 @@ impl Vm {
     // TODO: VmResult<T>
     pub fn execute(&mut self, bytecode: &Bytecode) {
         let mut ip = 0; // instruction pointer
-        let mut locals = vec![Value::Undefined; 256]; // local variables, size can be adjusted
+        let mut instructions = bytecode.instructions.clone();
 
-        while ip < bytecode.instructions.len() {
-            match &bytecode.instructions[ip] {
+        while ip < instructions.len() {
+            match &instructions[ip] {
                 // Handle each instruction type here
                 Instruction::PushConst(idx) => {
                     let value = bytecode
@@ -42,9 +42,11 @@ impl Vm {
                         Constant::Number(num) => self.stack.push(Value::Number(num)),
                         Constant::String(s) => self.stack.push(Value::String(s)),
                         Constant::Boolean(b) => self.stack.push(Value::Boolean(b)),
+                        Constant::Function(f) => self.stack.push(Value::Function(f)),
                         Constant::Null => self.stack.push(Value::Null),
                         Constant::Undefined => self.stack.push(Value::Undefined),
                     }
+                    ip += 1;
                 }
                 Instruction::Add => {
                     let b = self.stack.pop().unwrap();
@@ -59,6 +61,7 @@ impl Vm {
                             self.stack.push(Value::String(format!("{a_str}{b_str}")));
                         }
                     }
+                    ip += 1;
                 }
                 Instruction::Sub => {
                     let b = self.stack.pop().unwrap();
@@ -68,6 +71,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Number(f64::NAN));
                     }
+                    ip += 1;
                 }
                 Instruction::Mul => {
                     let b = self.stack.pop().unwrap();
@@ -77,6 +81,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Number(f64::NAN));
                     }
+                    ip += 1;
                 }
                 Instruction::Div => {
                     let b = self.stack.pop().unwrap();
@@ -86,16 +91,19 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Number(f64::NAN));
                     }
+                    ip += 1;
                 }
                 Instruction::Eq => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
                     self.stack.push(Value::Boolean(a == b));
+                    ip += 1;
                 }
                 Instruction::Neq => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
                     self.stack.push(Value::Boolean(a != b));
+                    ip += 1;
                 }
                 Instruction::Lt => {
                     let b = self.stack.pop().unwrap();
@@ -105,6 +113,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
+                    ip += 1;
                 }
                 Instruction::Gt => {
                     let b = self.stack.pop().unwrap();
@@ -114,6 +123,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
+                    ip += 1;
                 }
                 Instruction::Leq => {
                     let b = self.stack.pop().unwrap();
@@ -123,6 +133,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
+                    ip += 1;
                 }
                 Instruction::Geq => {
                     let b = self.stack.pop().unwrap();
@@ -132,6 +143,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
+                    ip += 1;
                 }
                 Instruction::JumpIfTrue(target) => {
                     let cond = self.stack.pop().unwrap();
@@ -139,6 +151,7 @@ impl Vm {
                         ip = *target;
                         continue;
                     }
+                    ip += 1;
                 }
                 Instruction::JumpIfFalse(target) => {
                     let cond = self.stack.pop().unwrap();
@@ -146,6 +159,7 @@ impl Vm {
                         ip = *target;
                         continue;
                     }
+                    ip += 1;
                 }
                 Instruction::Jump(target) => {
                     ip = *target;
@@ -153,25 +167,81 @@ impl Vm {
                 }
                 Instruction::Pop => {
                     self.stack.pop();
+                    ip += 1;
                 }
                 Instruction::StoreVar(index) => {
-                    let value = self.stack.pop().unwrap();
-                    if *index < locals.len() {
-                        locals[*index] = value;
+                    let idx = *index;
+                    if let Some(frame) = self.stack.frames.last_mut() {
+                        if idx < frame.locals.len() {
+                            frame.locals[idx] = self.stack.values.pop().unwrap();
+                        }
                     }
+                    ip += 1;
                 }
                 Instruction::LoadVar(index) => {
-                    let value = locals.get(*index).cloned().unwrap_or(Value::Undefined);
-                    self.stack.push(value);
+                    let idx = *index;
+                    if let Some(frame) = self.stack.frames.last() {
+                        let val = frame.locals.get(idx).cloned().unwrap_or(Value::Undefined);
+                        self.stack.push(val);
+                    }
+                    ip += 1;
                 }
                 Instruction::Print => {
                     let value = self.stack.peek().unwrap();
                     println!("{:?}", value);
+                    ip += 1;
+                }
+                Instruction::Call(argc) => {
+                    let func_idx = self.stack.values.len() - argc - 1;
+                    let callee = self.stack.values[func_idx].clone();
+
+                    let func = match callee {
+                        Value::Function(f) => f,
+                        _ => panic!("callee is not a funciton."),
+                    };
+
+                    self.stack.values.remove(func_idx);
+
+                    // Extract arguments from stack (in order)
+                    let mut args = Vec::with_capacity(*argc);
+                    for _ in 0..*argc {
+                        args.push(self.stack.pop().unwrap());
+                    }
+                    args.reverse(); // ensure original order
+
+                    // Prepare locals (function arity determines how many params we have)
+                    let mut locals = vec![Value::Undefined; 16]; // fixed size or func.local_count
+                    for (i, arg) in args.into_iter().enumerate() {
+                        locals[i] = arg;
+                    }
+
+                    let return_ip = ip + 1;
+
+                    self.stack.push_frame(Frame {
+                        return_ip,
+                        arg_count: *argc,
+                        base_pointer: func_idx,
+                        return_instructions: instructions.clone(),
+                        locals: locals,
+                    });
+
+                    instructions = func.chunk.clone();
+                    ip = 0;
+                }
+                Instruction::Return => {
+                    let ret = self.stack.pop().unwrap_or(Value::Undefined);
+
+                    let frame = self.stack.frames.pop().unwrap();
+
+                    self.stack.values.truncate(frame.base_pointer);
+
+                    instructions = frame.return_instructions;
+                    ip = frame.return_ip;
+
+                    self.stack.values.push(ret);
                 }
                 _ => unimplemented!(), // Placeholder for other instructions
             }
-
-            ip += 1; // Move to the next instruction
         }
     }
 }

@@ -86,6 +86,15 @@ pub enum Node {
     Undefined,
 }
 
+impl Node {
+    pub fn name(&self) -> String {
+        match self {
+            Node::Identifier(s) => s.to_string(),
+            _ => panic!("Unexpected node type"),
+        }
+    }
+}
+
 // Program structure
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Program {

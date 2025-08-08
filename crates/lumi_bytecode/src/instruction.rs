@@ -1,3 +1,5 @@
+use crate::core::FunctionObj;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Label(pub usize);
 
@@ -57,6 +59,7 @@ pub enum Constant {
     Number(f64),
     String(String),
     Boolean(bool),
+    Function(FunctionObj),
     Null,
     Undefined,
 }

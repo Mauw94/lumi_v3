@@ -31,13 +31,14 @@ where
         }
     }
 
-    // TODO: fix, calling function not fully implemented yet. This doesn't work
     fn generate_call_expression(&mut self, node: &Node) {
         if let Node::CallExpression(expr) = node {
+            self.visit_node(&expr.callee);
+
             for arg in &expr.arguments {
                 self.visit_node(arg);
             }
-            self.visit_node(&expr.callee);
+
             self.instructions()
                 .push(Instruction::Call(expr.arguments.len()));
         }

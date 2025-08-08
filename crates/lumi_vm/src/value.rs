@@ -1,3 +1,5 @@
+use lumi_bytecode::FunctionObj;
+
 use crate::heap::HandleId;
 
 /// Represents a value in the Lumi VM.
@@ -8,7 +10,7 @@ pub enum Value {
     Boolean(bool),
     Object(HandleId),
     Array(HandleId),
-    Function(HandleId),
+    Function(FunctionObj),
     Null,
     Undefined,
 }

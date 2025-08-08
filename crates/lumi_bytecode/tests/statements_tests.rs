@@ -1,4 +1,4 @@
-use lumi_bytecode::{BytecodeGenerator, Constant};
+use lumi_bytecode::{BytecodeGenerator, Constant, FunctionObj, Instruction};
 use lumi_parser::Parser;
 
 #[test]
@@ -20,7 +20,10 @@ fn test_simple_print_statement() {
     let mut bytecode_generator = BytecodeGenerator::new();
     let bytecode = bytecode_generator.generate(&ast);
 
-    assert_eq!(bytecode.constants, vec![Constant::Number(1.0), Constant::Number(2.0)]);
+    assert_eq!(
+        bytecode.constants,
+        vec![Constant::Number(1.0), Constant::Number(2.0)]
+    );
 }
 
 #[test]
@@ -63,5 +66,18 @@ fn test_fn_statement() {
     let mut bytecode_generator = BytecodeGenerator::new();
     let bytecode = bytecode_generator.generate(&ast);
 
-    assert_eq!(bytecode.constants, vec![]);
+    assert_eq!(
+        bytecode.constants,
+        vec![Constant::Function(FunctionObj {
+            name: None,
+            arity: 2,
+            chunk: vec![
+                Instruction::LoadVar(0),
+                Instruction::LoadVar(1),
+                Instruction::Add,
+                Instruction::Return
+            ],
+            constants: vec![]
+        })]
+    );
 }

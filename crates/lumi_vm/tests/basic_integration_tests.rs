@@ -46,3 +46,47 @@ fn test_value_is_boolean() {
 
     assert_eq!(vm.stack.values, vec![Value::Boolean(true)]);
 }
+
+#[test]
+fn test_fn_and_call_fn() {
+    let mut parser = Parser::new(
+        r#"
+        fn test(x, y) {
+            x + y;
+        }
+
+        test(1, 2);
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode);
+
+    assert_eq!(vm.stack.values, vec![Value::Number(3.0)]);
+}
+
+#[test]
+fn test_fn_with_passed_vars_and_call_fn() {
+    let mut parser = Parser::new(
+        r#"
+        fn test(x, y) {
+            x + y;
+        }
+
+        let x: int -> 2;
+        let y -> 5;
+        test(x, y);
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode);
+
+    assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
+}
