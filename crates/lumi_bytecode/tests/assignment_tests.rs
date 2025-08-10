@@ -20,7 +20,7 @@ fn test_call_expression() {
         bytecode.constants,
         vec![
             Constant::Function(FunctionObj {
-                name: None,
+                name: Some("test".to_string()),
                 arity: 2,
                 chunk: vec![
                     Instruction::LoadVar(0),

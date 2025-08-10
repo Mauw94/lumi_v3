@@ -1,4 +1,4 @@
-use lumi_bytecode::{Bytecode, Constant, Instruction};
+use lumi_bytecode::{Bytecode, Constant, FunctionObj, Instruction};
 use lumi_vm::{Value, Vm};
 
 #[test]
@@ -10,10 +10,6 @@ fn test_execute_basic_add() {
             Instruction::PushConst(1), // Push second constant
             Instruction::Add,          // Add the two values
         ],
-        //     constants:  vec![
-        //     Value::Number(5.0), // Constant at index 0
-        //     Value::Number(3.0), // Constant at index 1
-        // ]
         constants: vec![
             Constant::Number(5.0), // Constant at index 0
             Constant::Number(3.0), // Constant at index 1
@@ -58,3 +54,41 @@ fn test_print_statement() {
 }
 
 // TODO: extend vm tests to test more instructions etc (print, if, fn)
+#[test]
+fn test_fn_statement() {
+    // Example
+    r#"
+        fn test(x, y) {
+            x + y;
+        }
+
+        test(1, 2);
+    "#;
+    let mut vm = Vm::new();
+    let bytecode = Bytecode {
+        instructions: vec![
+            Instruction::PushConst(0),
+            Instruction::PushConst(1),
+            Instruction::PushConst(2),
+            Instruction::Call(2),
+        ],
+        constants: vec![
+            Constant::Function(FunctionObj {
+                name: Some("test".to_string()),
+                arity: 2,
+                chunk: vec![
+                    Instruction::LoadVar(0),
+                    Instruction::LoadVar(1),
+                    Instruction::Add,
+                    Instruction::Return,
+                ],
+                constants: vec![],
+            }),
+            Constant::Number(1.0),
+            Constant::Number(2.0),
+        ],
+    };
+
+    vm.execute(&bytecode);
+    assert_eq!(vm.stack.values, vec![Value::Number(3.0)]);
+}

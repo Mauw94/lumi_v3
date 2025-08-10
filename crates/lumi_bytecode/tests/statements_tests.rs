@@ -69,7 +69,7 @@ fn test_fn_statement() {
     assert_eq!(
         bytecode.constants,
         vec![Constant::Function(FunctionObj {
-            name: None,
+            name: Some("test".to_string()),
             arity: 2,
             chunk: vec![
                 Instruction::LoadVar(0),
