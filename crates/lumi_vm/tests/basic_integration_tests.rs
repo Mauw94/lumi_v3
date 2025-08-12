@@ -48,6 +48,26 @@ fn test_value_is_boolean() {
 }
 
 #[test]
+fn test_variables_and_print() {
+    let mut parser = Parser::new(
+        r#"
+        let x: int -> 5;
+        let y: int -> 15;
+
+        print x * y;
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode);
+
+    assert_eq!(vm.stack.values, vec![Value::Number(75.0)]);
+}
+
+#[test]
 fn test_fn_and_call_fn() {
     let mut parser = Parser::new(
         r#"

@@ -209,8 +209,7 @@ impl Vm {
                     }
                     args.reverse(); // ensure original order
 
-                    // Prepare locals (function arity determines how many params we have)
-                    let mut locals = vec![Value::Undefined; 16]; // fixed size or func.local_count
+                    let mut locals = vec![Value::Undefined; 16];
                     for (i, arg) in args.into_iter().enumerate() {
                         locals[i] = arg;
                     }
@@ -225,6 +224,8 @@ impl Vm {
                         locals: locals,
                     });
 
+                    // Set the instructions to the functions instructions chunk and start from 0 again.
+                    // The frame has a pointer and copy of the previous instruction set.
                     instructions = func.chunk.clone();
                     ip = 0;
                 }
