@@ -40,6 +40,9 @@ pub enum Type {
 
     /// Any type (can be anything)
     Any,
+
+    /// Type is unkown
+    Unknown,
 }
 
 impl Type {
@@ -126,6 +129,7 @@ impl Type {
                 types_str.join(" | ")
             }
             Type::Any => "any".to_string(),
+            Type::Unknown => "unkown".to_string(),
         }
     }
 }

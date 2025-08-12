@@ -76,3 +76,33 @@ fn test_reassignment_with_different_type() {
     let result = analyze(&ast);
     assert!(result.is_err());
 }
+
+#[test]
+fn test_function_declaration() {
+    let mut parser = Parser::new(
+        r#"
+        fn test(x, y) {
+            x + y;
+        }
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let result = analyze(&ast);
+    assert!(!result.is_err());
+}
+
+#[test]
+fn test_wrong_function_call() {
+    let mut parser = Parser::new(
+        r#"
+        fn test(x, y) {
+            x + y;
+        }
+
+        functionname(1, 2);
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let result = analyze(&ast);
+    assert!(result.is_err());
+}

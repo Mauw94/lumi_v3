@@ -299,6 +299,7 @@ dependencies = [
  "lumi_ast",
  "lumi_bytecode",
  "lumi_parser",
+ "thiserror",
 ]
 
 [[package]]

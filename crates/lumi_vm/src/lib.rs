@@ -1,3 +1,4 @@
+mod error;
 mod frame;
 mod heap;
 mod stack;

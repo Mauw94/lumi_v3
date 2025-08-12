@@ -3,7 +3,7 @@ use lumi_ast::{
     FunctionDeclaration, IfStatement, LogicalExpression, Node, Position, PrintStatement, Program,
     Span, UnaryExpression, VariableDeclaration, VariableDeclarator,
 };
-use lumi_lexer::{lexer, token::TokenKind, Lexer, Token};
+use lumi_lexer::{token::TokenKind, Lexer, Token};
 
 use crate::{
     error::{ParseResult, ParserError},

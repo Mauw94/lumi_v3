@@ -9,3 +9,4 @@ license = "MIT"
 lumi_parser = { path = "../lumi_parser" }
 lumi_ast = { path = "../lumi_ast" }
 lumi_bytecode = { path = "../lumi_bytecode" }
+thiserror = "1.0"

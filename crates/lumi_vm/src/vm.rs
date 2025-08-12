@@ -1,6 +1,12 @@
 use lumi_bytecode::{Bytecode, Constant, Instruction};
 
-use crate::{frame::Frame, heap::Heap, stack::Stack, value::Value};
+use crate::{
+    error::{VMError, VmResult},
+    frame::Frame,
+    heap::Heap,
+    stack::Stack,
+    value::Value,
+};
 
 /// The virtual machine (VM) for the Lumi engine.
 pub struct Vm {
@@ -21,9 +27,7 @@ impl Vm {
         }
     }
 
-    // TODO: add Result<Value, VMError> add VMError
-    // TODO: VmResult<T>
-    pub fn execute(&mut self, bytecode: &Bytecode) {
+    pub fn execute(&mut self, bytecode: &Bytecode) -> VmResult<()> {
         let mut ip = 0; // instruction pointer
         let mut instructions = bytecode.instructions.clone();
 
@@ -197,7 +201,7 @@ impl Vm {
 
                     let func = match callee {
                         Value::Function(f) => f,
-                        _ => panic!("callee is not a funciton."),
+                        _ => return Err(VMError::callee_is_not_a_function(callee)),
                     };
 
                     self.stack.values.remove(func_idx);
@@ -244,5 +248,6 @@ impl Vm {
                 _ => unimplemented!(), // Placeholder for other instructions
             }
         }
+        Ok(())
     }
 }

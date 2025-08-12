@@ -76,6 +76,15 @@ pub enum ScopeType {
 }
 
 impl Scope {
+    pub fn new() -> Self {
+        Self {
+            variables: HashMap::new(),
+            functions: HashMap::new(),
+            parent: None,
+            scope_type: ScopeType::Global,
+        }
+    }
+
     /// Create a new global scope
     pub fn new_global() -> Self {
         Self {
@@ -97,7 +106,21 @@ impl Scope {
     }
 
     /// Declare a variable in this scope
-    pub fn declare_variable(
+    pub fn declare_variable(&mut self, name: String, var_type: Type, line: usize) {
+        self.variables.insert(
+            name.clone(),
+            VariableInfo {
+                name: name,
+                type_info: var_type,
+                mutable: true,
+                initialized: true,
+                line: line,
+            },
+        );
+    }
+
+    /// Declare a variable with additional details in this scope
+    pub fn declare_variable_with_details(
         &mut self,
         name: &str,
         type_info: Type,
@@ -138,6 +161,16 @@ impl Scope {
             .or_else(|| self.parent.as_ref().and_then(|p| p.get_variable(name)))
     }
 
+    /// Gets the type of the variable
+    pub fn get_variable_type(&self, name: &str) -> Option<Type> {
+        if let Some(var_info) = self.variables.get(name) {
+            Some(var_info.type_info.clone())
+        } else if let Some(ref parent) = self.parent {
+            parent.get_variable_type(name)
+        } else {
+            None
+        }
+    }
     /// Check if a variable is declared in this scope or any parent scope
     pub fn is_variable_declared(&self, name: &str) -> bool {
         self.variables.contains_key(name)
