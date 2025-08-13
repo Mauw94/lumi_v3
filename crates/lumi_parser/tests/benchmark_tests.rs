@@ -22,7 +22,7 @@ fn test_parser_performance_simple() {
 #[test]
 fn test_parser_performance_complex() {
     let source = r#"
-              fn fibonacci(n) {
+        fn fibonacci(n) {
             if (n <= 1) {
                 return n;
             }

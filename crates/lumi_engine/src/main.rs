@@ -25,7 +25,7 @@ fn reply(engine: &Engine) {
     let mut input = String::new();
     while prompt(&mut input) {
         match engine.evaluate(&input) {
-            Ok(value) => println!("{:?}", value), // TODO: implement Display for Value
+            Ok(_) => {}
             Err(e) => println!("{e}"),
         }
     }

@@ -1,7 +1,7 @@
 use lumi_bytecode::BytecodeGenerator;
 use lumi_parser::Parser;
 use lumi_semantic::analyze;
-use lumi_vm::{Value, Vm};
+use lumi_vm::Vm;
 
 pub struct Engine;
 
@@ -10,7 +10,7 @@ impl Engine {
         Self {}
     }
 
-    pub fn evaluate(&self, source: &str) -> Result<Value, String> {
+    pub fn evaluate(&self, source: &str) -> Result<(), String> {
         let mut parser = Parser::new(source);
         let ast = parser.parse().map_err(|e| format!("Parser error: {e}"))?;
 
@@ -20,8 +20,8 @@ impl Engine {
         let bytecode = bytecode_generator.generate(&ast);
 
         let mut vm = Vm::new();
-        vm.execute(&bytecode);
+        vm.execute(&bytecode).unwrap();
 
-        Ok(vm.stack.pop().unwrap_or(Value::Undefined))
+        Ok(())
     }
 }

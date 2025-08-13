@@ -192,7 +192,7 @@ impl Vm {
                 }
                 Instruction::Print => {
                     let value = self.stack.peek().unwrap();
-                    println!("{:?}", value);
+                    println!("{:?}", value.to_string());
                     ip += 1;
                 }
                 Instruction::Call(argc) => {
