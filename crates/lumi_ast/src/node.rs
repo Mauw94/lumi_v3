@@ -191,11 +191,11 @@ pub struct IfStatement {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ForStatement {
-    pub iterator: Box<Node>,      // e.g. "i" in "for i in 0 to 10"
-    pub start: Box<Node>,         // e.g. "0" in "for i in 0 to 10"
-    pub end: Box<Node>,           // e.g. "10" in "for i in 0 to 10"
-    pub step: Option<Box<Node>>,  // Optional step value, e.g. "2" in "for i in 0 to 10 step 2"
-    pub body: Box<Node>,          // The body of the loop
+    pub iterator: Box<Node>,
+    pub start: Box<Node>,
+    pub end: Box<Node>,
+    pub step: Option<Box<Node>>,
+    pub body: Box<Node>,
     pub span: Option<Span>,
 }
 

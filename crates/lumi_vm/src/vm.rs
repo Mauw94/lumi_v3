@@ -34,12 +34,12 @@ impl Vm {
         while ip < instructions.len() {
             match &instructions[ip] {
                 Instruction::PushConst(idx) => {
-                    let value = bytecode
+                    let constant = bytecode
                         .constants
                         .get(*idx)
                         .cloned()
                         .unwrap_or(Constant::Undefined);
-                    self.stack.push(Stack::convert_constant_to_value(value));
+                    self.stack.push(Stack::convert_constant_to_value(constant));
                     ip += 1;
                 }
                 Instruction::Add => {
