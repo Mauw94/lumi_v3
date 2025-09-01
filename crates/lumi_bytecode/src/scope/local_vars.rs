@@ -3,6 +3,7 @@ use std::collections::HashMap;
 pub trait ScopeManager {
     fn get_or_create_local(&mut self, name: &str) -> usize;
     fn get_local(&self, name: &str) -> Option<&usize>;
+    fn new_temp_local(&mut self) -> usize;
 }
 
 pub trait ScopeCore {
@@ -29,5 +30,11 @@ where
 
     fn get_local(&self, name: &str) -> Option<&usize> {
         self.local_vars().get(name)
+    }
+
+    fn new_temp_local(&mut self) -> usize {
+        let idx = self.next_local();
+        self.set_next_local(idx + 1);
+        idx
     }
 }

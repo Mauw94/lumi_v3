@@ -15,6 +15,7 @@ pub struct Vm {
     // pub registers: Registers // TODO: add later
     pub heap: Heap,
     pub globals: Vec<Value>,
+    pub locals: Vec<Value>,
 }
 
 impl Vm {
@@ -24,6 +25,7 @@ impl Vm {
             frame: Frame::new(),
             heap: Heap::new(),
             globals: Vec::new(),
+            locals: vec![Value::Undefined; 16],
         }
     }
 
@@ -169,6 +171,8 @@ impl Vm {
                         if idx < frame.locals.len() {
                             frame.locals[idx] = self.stack.values.pop().unwrap();
                         }
+                    } else {
+                        self.locals[idx] = self.stack.values.pop().unwrap();
                     }
                     ip += 1;
                 }
@@ -177,6 +181,12 @@ impl Vm {
                     if let Some(frame) = self.stack.frames.last() {
                         let val = frame.locals.get(idx).cloned().unwrap_or(Value::Undefined);
                         self.stack.push(val);
+                    } else {
+                        self.locals
+                            .get(idx)
+                            .cloned()
+                            .map(|v| self.stack.push(v))
+                            .unwrap_or_else(|| self.stack.push(Value::Undefined));
                     }
                     ip += 1;
                 }

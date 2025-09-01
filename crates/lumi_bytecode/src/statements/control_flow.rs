@@ -46,53 +46,44 @@ where
 
     fn generate_for_statement(&mut self, node: &Node) {
         if let Node::ForStatement(stmt) = node {
-            // Initialize the loop variable
+            let var_idx = match &*stmt.iterator {
+                Node::Identifier(id) => self.get_or_create_local(&id.clone()),
+                _ => unreachable!("Iterator must be an identifier"),
+            };
+
             self.visit_node(&stmt.start);
-            if let Node::Identifier(id) = &*stmt.iterator {
-                let var_name = id.clone();
-                let idx = self.get_or_create_local(&var_name);
-                self.emit(Instruction::StoreVar(idx));
+            self.emit(Instruction::StoreVar(var_idx));
+
+            let end_idx = self.new_temp_local();
+            self.visit_node(&stmt.end);
+            self.emit(Instruction::StoreVar(end_idx));
+
+            let step_idx = self.new_temp_local();
+            if let Some(step) = &stmt.step {
+                self.visit_node(step);
             } else {
-                unreachable!("Iterator must be an identifier");
+                self.emit(Instruction::PushConst(1));
             }
+            self.emit(Instruction::StoreVar(step_idx));
 
             let start_label = self.new_label();
             let end_label = self.new_label();
 
             self.patch_label(start_label);
 
-            // Load the loop variable
-            if let Node::Identifier(id) = &*stmt.iterator {
-                let var_name = id.clone();
-                let idx = self.get_or_create_local(&var_name);
-                self.emit(Instruction::LoadVar(idx));
-            }
-
-            // Load the end value
-            self.visit_node(&stmt.end);
+            self.emit(Instruction::LoadVar(var_idx));
+            self.emit(Instruction::LoadVar(end_idx));
             self.emit(Instruction::Leq);
 
             self.emit_jump_if_false(end_label);
-            self.emit(Instruction::Pop);
 
-            // Loop body
             self.visit_node(&stmt.body);
             self.emit(Instruction::Pop);
 
-            // Increment the loop variable
-            if let Node::Identifier(id) = &*stmt.iterator {
-                let var_name = id.clone();
-                let idx = self.get_or_create_local(&var_name);
-                self.emit(Instruction::LoadVar(idx));
-                if let Some(step) = &stmt.step {
-                    self.visit_node(step);
-                } else {
-                    // Default step is 1
-                    self.emit(Instruction::PushConst(1));
-                }
-                self.emit(Instruction::Add);
-                self.emit(Instruction::StoreVar(idx));
-            }
+            self.emit(Instruction::LoadVar(var_idx));
+            self.emit(Instruction::LoadVar(step_idx));
+            self.emit(Instruction::Add);
+            self.emit(Instruction::StoreVar(var_idx));
 
             self.emit_jump(start_label);
             self.patch_label(end_label);

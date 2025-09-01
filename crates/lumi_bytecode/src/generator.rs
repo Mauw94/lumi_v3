@@ -193,41 +193,69 @@ impl ControlFlowCore for BytecodeGenerator {
 
     /// Patch all unpatched_jump instructions with their correct indices.
     fn patch_label(&mut self, label: Label) {
+        // the instruction index where this label starts
         let position = self.instructions.len();
+
+        // Defensive: don't allow re-defining a label twice.
+        if self.label_positions.contains_key(&label) {
+            panic!("Label {:?} already defined", label);
+        }
         self.label_positions.insert(label, position);
 
+        // If there are jumps waiting for this label, patch them.
         if let Some(jumps) = self.unpatched_jumps.remove(&label) {
             for jump in jumps {
                 match jump {
-                    PendingJump::Jump(pos) => self.instructions[pos] = Instruction::Jump(position),
+                    PendingJump::Jump(pos) => {
+                        // sanity check: ensure pos is in-range
+                        if pos >= self.instructions.len() {
+                            panic!("Pending jump position {} out of range", pos);
+                        }
+                        self.instructions[pos] = Instruction::Jump(position);
+                    }
                     PendingJump::JumpIfFalse(pos) => {
-                        self.instructions[pos] = Instruction::JumpIfFalse(position)
+                        if pos >= self.instructions.len() {
+                            panic!("Pending jump position {} out of range", pos);
+                        }
+                        self.instructions[pos] = Instruction::JumpIfFalse(position);
                     }
                 }
             }
         }
     }
 
-    /// Emit a Jump instruction and push to unpatched_jumps
+    /// Emit a Jump instruction. If the label is already defined, emit the final target.
+    /// Otherwise emit a placeholder and record the pending jump.
     fn emit_jump(&mut self, label: Label) {
         let pos = self.instructions.len();
-        self.instructions.push(Instruction::Jump(0)); // placeholder
 
-        self.unpatched_jumps
-            .entry(label)
-            .or_default()
-            .push(PendingJump::Jump(pos));
+        if let Some(&target) = self.label_positions.get(&label) {
+            // Label already defined: emit final jump directly
+            self.instructions.push(Instruction::Jump(target));
+        } else {
+            // Label not defined yet: push a placeholder immediate and record the pending jump.
+            // Use usize::MAX as a clear sentinel value so it's obvious if something goes wrong.
+            self.instructions.push(Instruction::Jump(usize::MAX));
+            self.unpatched_jumps
+                .entry(label)
+                .or_default()
+                .push(PendingJump::Jump(pos));
+        }
     }
 
     /// Emit a JumpIfFalse instruction and push to unpatched_jumps
     fn emit_jump_if_false(&mut self, label: Label) {
         let pos = self.instructions.len();
-        self.instructions.push(Instruction::JumpIfFalse(0)); // placeholder
 
-        self.unpatched_jumps
-            .entry(label)
-            .or_default()
-            .push(PendingJump::JumpIfFalse(pos));
+        if let Some(&target) = self.label_positions.get(&label) {
+            self.instructions.push(Instruction::JumpIfFalse(target));
+        } else {
+            self.instructions.push(Instruction::JumpIfFalse(usize::MAX));
+            self.unpatched_jumps
+                .entry(label)
+                .or_default()
+                .push(PendingJump::JumpIfFalse(pos));
+        }
     }
 
     /// Emit an instruction
