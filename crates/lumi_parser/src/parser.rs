@@ -1,7 +1,7 @@
 use lumi_ast::{
     AssignmentExpression, BinaryExpression, BlockStatement, CallExpression, ExpressionStatement,
-    FunctionDeclaration, IfStatement, LogicalExpression, Node, Position, PrintStatement, Program,
-    Span, UnaryExpression, VariableDeclaration, VariableDeclarator,
+    ForStatement, FunctionDeclaration, IfStatement, LogicalExpression, Node, Position,
+    PrintStatement, Program, Span, UnaryExpression, VariableDeclaration, VariableDeclarator,
 };
 use lumi_lexer::{token::TokenKind, Lexer, Token};
 
@@ -97,7 +97,7 @@ impl Parser {
                     "if" => self.parse_if_statement(),
                     "print" => self.parse_print_statement(),
                     "fn" => self.parse_function_statement(),
-                    // "for" => self.parse_for_loop(),
+                    "for" => self.parse_for_statement(),
                     // "while" => self.parse_while_loop(),
                     // _ => self.parse_expression_statement(),
                     _ => {
@@ -142,6 +142,36 @@ impl Parser {
 
         let span = self.create_span_from_tokens();
         Ok(Node::BlockStatement(BlockStatement {
+            body,
+            span: Some(span),
+        }))
+    }
+
+    /// Parse for loop statement
+    fn parse_for_statement(&mut self) -> ParseResult<Node> {
+        // example for loop
+        // for i in 1 to 10 step 5 { // the step keyword is optional, default is 1
+        // }
+        self.advance();
+        let id = Box::new(self.parse_identifier()?);
+        self.expect(TokenKind::Keyword("in".to_string()))?;
+        let start = Box::new(self.parse_expression()?);
+        self.expect(TokenKind::Keyword("to".to_string()))?;
+        let end = Box::new(self.parse_expression()?);
+        let step = if self.check(TokenKind::Keyword("step".to_string())) {
+            self.advance(); // consume 'step'
+            Some(Box::new(self.parse_expression()?))
+        } else {
+            None
+        };
+        let body = Box::new(self.parse_statement()?);
+        let span = self.create_span_from_tokens();
+
+        Ok(Node::ForStatement(ForStatement {
+            iterator: id,
+            start,
+            end,
+            step,
             body,
             span: Some(span),
         }))

@@ -70,3 +70,18 @@ fn test_parser_performance_large_source() {
     // Should complete in reasonable time (less than 1 second)
     assert!(duration.as_millis() < 1000);
 }
+
+#[test]
+fn test_parser_performance_long_for_loop() {
+    let source = String::from("for i in 0 to 10000 step 1 { print i; }");
+    let start = Instant::now();
+    let mut parser = Parser::new(&source);
+    let result = parser.parse();
+    assert!(result.is_ok());
+
+    let duration = start.elapsed();
+    println!("Long for loop parsing took: {:?} ", duration);
+
+    // Should complete in reasonable time (less than 1 second)
+    assert!(duration.as_millis() < 1000);
+}

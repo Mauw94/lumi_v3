@@ -25,6 +25,7 @@ pub trait Visitor {
             Node::BlockStatement(block_statement) => todo!(),
             Node::FunctionDeclaration(function_declaration) => todo!(),
             Node::CallExpression(call_expression) => todo!(),
+            Node::ForStatement(for_statement) => todo!(),
         }
     }
 

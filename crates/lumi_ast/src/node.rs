@@ -73,6 +73,7 @@ pub enum Node {
     ExpressionStatement(ExpressionStatement),
     BlockStatement(BlockStatement),
     IfStatement(IfStatement),
+    ForStatement(ForStatement),
 
     // Literals
     ArrayLiteral(ArrayLiteral),
@@ -185,6 +186,16 @@ pub struct IfStatement {
     pub expr: Box<Node>,
     pub stmt: Box<Node>,
     pub else_part: Option<Box<Node>>,
+    pub span: Option<Span>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ForStatement {
+    pub iterator: Box<Node>,      // e.g. "i" in "for i in 0 to 10"
+    pub start: Box<Node>,         // e.g. "0" in "for i in 0 to 10"
+    pub end: Box<Node>,           // e.g. "10" in "for i in 0 to 10"
+    pub step: Option<Box<Node>>,  // Optional step value, e.g. "2" in "for i in 0 to 10 step 2"
+    pub body: Box<Node>,          // The body of the loop
     pub span: Option<Span>,
 }
 
