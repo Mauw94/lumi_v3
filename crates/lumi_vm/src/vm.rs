@@ -33,23 +33,13 @@ impl Vm {
 
         while ip < instructions.len() {
             match &instructions[ip] {
-                // Handle each instruction type here
                 Instruction::PushConst(idx) => {
                     let value = bytecode
                         .constants
                         .get(*idx)
                         .cloned()
                         .unwrap_or(Constant::Undefined);
-                    // TODO: move to a method in Stack
-                    // Convert Constant to Value and push onto the stack
-                    match value {
-                        Constant::Number(num) => self.stack.push(Value::Number(num)),
-                        Constant::String(s) => self.stack.push(Value::String(s)),
-                        Constant::Boolean(b) => self.stack.push(Value::Boolean(b)),
-                        Constant::Function(f) => self.stack.push(Value::Function(f)),
-                        Constant::Null => self.stack.push(Value::Null),
-                        Constant::Undefined => self.stack.push(Value::Undefined),
-                    }
+                    self.stack.push(Stack::convert_constant_to_value(value));
                     ip += 1;
                 }
                 Instruction::Add => {

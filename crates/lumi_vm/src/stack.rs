@@ -1,3 +1,5 @@
+use lumi_bytecode::Constant;
+
 use crate::{frame::Frame, value::Value};
 
 /// Stack is a structure that holds the values and frames for the virtual machine.
@@ -33,5 +35,16 @@ impl Stack {
 
     pub fn pop_frame(&mut self) -> Option<Frame> {
         self.frames.pop()
+    }
+
+    pub fn convert_constant_to_value(constant: Constant) -> Value {
+        match constant {
+            Constant::Number(n) => Value::Number(n),
+            Constant::String(s) => Value::String(s),
+            Constant::Boolean(b) => Value::Boolean(b),
+            Constant::Function(f) => Value::Function(f),
+            Constant::Null => Value::Null,
+            Constant::Undefined => Value::Undefined,
+        }
     }
 }
