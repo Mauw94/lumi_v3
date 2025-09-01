@@ -81,3 +81,26 @@ fn test_fn_statement() {
         })]
     );
 }
+
+#[test]
+fn test_for_statement() {
+    let mut parser = Parser::new(
+        r#"
+        for i in 1 to 5 step 2 {
+            print i;
+        }
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    assert_eq!(
+        bytecode.constants,
+        vec![
+            Constant::Number(1.0),
+            Constant::Number(5.0),
+            Constant::Number(2.0)
+        ]
+    );
+}

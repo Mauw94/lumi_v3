@@ -64,6 +64,9 @@ impl BytecodeGenerator {
             Node::IfStatement(_stmt) => {
                 <Self as ControlFlowGenerator>::generate_if_statement(self, node);
             }
+            Node::ForStatement(_stmt) => {
+                <Self as ControlFlowGenerator>::generate_for_statement(self, node);
+            }
             Node::BlockStatement(block) => {
                 for stmt in &block.body {
                     self.visit_node(&stmt);
