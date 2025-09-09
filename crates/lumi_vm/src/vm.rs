@@ -1,4 +1,4 @@
-use lumi_bytecode::{Bytecode, Constant, Instruction};
+use lumi_bytecode::{Bytecode, Constant, FunctionObj, Instruction};
 
 use crate::{
     error::{VMError, VmResult},
@@ -16,6 +16,7 @@ pub struct Vm {
     pub heap: Heap,
     pub globals: Vec<Value>,
     pub locals: Vec<Value>,
+    pub fns: Vec<FunctionObj>,
 }
 
 impl Vm {
@@ -26,6 +27,7 @@ impl Vm {
             heap: Heap::new(),
             globals: Vec::new(),
             locals: vec![Value::Undefined; 16],
+            fns: Vec::new(),
         }
     }
 
@@ -41,7 +43,12 @@ impl Vm {
                         .get(*idx)
                         .cloned()
                         .unwrap_or(Constant::Undefined);
-                    self.stack.push(Stack::convert_constant_to_value(constant));
+                    match constant {
+                        Constant::Function(ref f) => {
+                            self.fns.push(f.clone());
+                        }
+                        _ => self.stack.push(Stack::convert_constant_to_value(constant)),
+                    }
                     ip += 1;
                 }
                 Instruction::Add => {
@@ -195,20 +202,17 @@ impl Vm {
                     println!("{:?}", value.to_string());
                     ip += 1;
                 }
-                Instruction::Call(argc) => {
-                    let func_idx = self.stack.values.len() - argc - 1;
-                    let callee = self.stack.values[func_idx].clone();
-
-                    let func = match callee {
-                        Value::Function(f) => f,
-                        _ => return Err(VMError::callee_is_not_a_function(callee)),
-                    };
-
-                    self.stack.values.remove(func_idx);
+                Instruction::CallFn(fn_name) => {
+                    let function = self.fns.iter().find(|f| f.name.as_ref() == Some(fn_name));
+                    if function.is_none() {
+                        return Err(VMError::function_not_found(fn_name));
+                    }
+                    let function = function.unwrap();
+                    let argc = function.arity;
 
                     // Extract arguments from stack (in order)
-                    let mut args = Vec::with_capacity(*argc);
-                    for _ in 0..*argc {
+                    let mut args = Vec::with_capacity(argc);
+                    for _ in 0..argc {
                         args.push(self.stack.pop().unwrap());
                     }
                     args.reverse(); // ensure original order
@@ -222,28 +226,36 @@ impl Vm {
 
                     self.stack.push_frame(Frame {
                         return_ip,
-                        arg_count: *argc,
-                        base_pointer: func_idx,
+                        arg_count: argc,
+                        base_pointer: 0, // NOTE: atm we don't use base_pointer since our functions don't live on the stack.
                         return_instructions: instructions.clone(),
                         locals: locals,
                     });
 
                     // Set the instructions to the functions instructions chunk and start from 0 again.
                     // The frame has a pointer and copy of the previous instruction set.
-                    instructions = func.chunk.clone();
+                    instructions = function.chunk.clone();
                     ip = 0;
                 }
                 Instruction::Return => {
-                    let ret = self.stack.pop().unwrap_or(Value::Undefined);
-
                     let frame = self.stack.frames.pop().unwrap();
 
-                    self.stack.values.truncate(frame.base_pointer);
+                    let ret = if self.stack.values.len() > frame.base_pointer + 1 {
+                        self.stack.pop().unwrap()
+                    } else {
+                        Value::Undefined
+                    };
+
+                    // Leave the callee (function) on the stack.
+                    self.stack.values.truncate(frame.base_pointer + 1);
+
+                    // Push the return value
+                    if ret != Value::Undefined {
+                        self.stack.values.push(ret);
+                    }
 
                     instructions = frame.return_instructions;
                     ip = frame.return_ip;
-
-                    self.stack.values.push(ret);
                 }
                 _ => unimplemented!(), // Placeholder for other instructions
             }

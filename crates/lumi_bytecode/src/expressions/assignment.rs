@@ -39,8 +39,11 @@ where
                 self.visit_node(arg);
             }
 
+            // NOTE: here we assume that the callee is always an identifier (function name)
+            // In a more complete implementation, we would need to handle other cases (e.g.,
+            // function expressions, member expressions, etc.)
             self.instructions()
-                .push(Instruction::Call(expr.arguments.len()));
+                .push(Instruction::CallFn(expr.callee.name().to_string()));
         }
     }
 }

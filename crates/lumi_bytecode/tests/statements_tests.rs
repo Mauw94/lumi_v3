@@ -104,3 +104,39 @@ fn test_for_statement() {
         ]
     );
 }
+
+#[test]
+fn test_for_statement_with_function_call() {
+    let mut parser = Parser::new(
+        r#"
+        fn printSomething(x) {
+            print x;
+        }
+        for i in 1 to 10 step 1 {
+            printSomething(i);
+        }
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    assert_eq!(
+        bytecode.constants,
+        vec![
+            Constant::Function(FunctionObj {
+                name: Some("printSomething".to_string()),
+                arity: 1,
+                chunk: vec![
+                    Instruction::LoadVar(0),
+                    Instruction::Print,
+                    Instruction::Return
+                ],
+                constants: vec![]
+            }),
+            Constant::Number(1.0),
+            Constant::Number(10.0),
+            Constant::Number(1.0)
+        ]
+    );
+}

@@ -31,7 +31,7 @@ pub enum Instruction {
     Jump(usize),        // Unconditional jump to a specific instruction index
     JumpIfTrue(usize),  // Conditional jump if the top value is true
     JumpIfFalse(usize), // Conditional jump if the top value is false
-    Call(usize),        // Call a function at a specific index
+    CallFn(String),     // Call a function with a given name
     Return,             // Return from the current function
     LoadVar(usize),     // Load a variable by index
     StoreVar(usize),    // Store the top value into a variable by index
