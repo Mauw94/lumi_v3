@@ -33,3 +33,38 @@ fn test_executing_many_variable_declarations() {
         "Benchmark failed: took too long to execute variable declarations"
     );
 }
+
+#[test]
+fn test_executing_simple_function_many_times() {
+    let start = Instant::now();
+
+    let source = r#"
+        fn add(a, b) {
+            return a + b;
+        }
+
+        let result: int -> 1;
+        for i in 1 to 100000 step 1 {
+            result = add(result, i);
+        }
+
+        print result;
+    "#;
+
+    let mut parser = Parser::new(source);
+    let ast = parser.parse().unwrap();
+
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode).unwrap();
+
+    let duration = start.elapsed();
+    println!("Time taken to execute function calls: {:?}", duration);
+
+    assert!(
+        duration.as_millis() < 1000,
+        "Benchmark failed: took too long to execute function calls"
+    );
+}
