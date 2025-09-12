@@ -68,9 +68,11 @@ impl BytecodeGenerator {
                 <Self as ControlFlowGenerator>::generate_for_statement(self, node);
             }
             Node::BlockStatement(block) => {
+                // NOTE: push instruction for entering a new block scope
                 for stmt in &block.body {
                     self.visit_node(&stmt);
                 }
+                // NOTE: push instruction that we are leaving the block scope
             }
             Node::PrintStatement(stmt) => {
                 self.visit_node(&stmt.argument);

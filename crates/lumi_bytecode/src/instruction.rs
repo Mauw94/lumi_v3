@@ -12,7 +12,7 @@ pub enum PendingJump {
 /// This module defines the bytecode instructions for the Lumi engine.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Instruction {
-    PushConst(usize), // Push a constant value onto the stack
+    PushConst(usize), // Push a constant value onto the stack with index of the constant in the (bytecode) constant pool.
     Pop,              // Pop the top value from the stack
     Add,
     // Arithmetic operations

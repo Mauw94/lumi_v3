@@ -1,33 +1,32 @@
-use lumi_bytecode::{Bytecode, Constant, FunctionObj, Instruction};
+use std::{cell::RefCell, rc::Rc};
+
+use lumi_bytecode::{Bytecode, Constant, Env, Instruction};
 
 use crate::{
     error::{VMError, VmResult},
     frame::Frame,
-    heap::Heap,
     stack::Stack,
     value::Value,
 };
 
 /// The virtual machine (VM) for the Lumi engine.
 pub struct Vm {
+    // TODO: add later
+    // pub registers: Registers
+    // pub heap: Heap
+    pub env: Rc<RefCell<Env>>, // TODO: add instruction when entering a new scope and leaving a scope.
     pub stack: Stack,
-    pub frame: Frame,
-    // pub registers: Registers // TODO: add later
-    pub heap: Heap,
     pub globals: Vec<Value>,
     pub locals: Vec<Value>,
-    pub fns: Vec<FunctionObj>,
 }
 
 impl Vm {
     pub fn new() -> Self {
         Vm {
+            env: Rc::new(RefCell::new(Env::new(None))),
             stack: Stack::new(),
-            frame: Frame::new(),
-            heap: Heap::new(),
-            globals: Vec::new(),
+            globals: vec![Value::Undefined; 256],
             locals: vec![Value::Undefined; 16],
-            fns: Vec::new(),
         }
     }
 
@@ -45,7 +44,7 @@ impl Vm {
                         .unwrap_or(Constant::Undefined);
                     match constant {
                         Constant::Function(ref f) => {
-                            self.fns.push(f.clone());
+                            self.env.borrow_mut().add_function(f.clone());
                         }
                         _ => self.stack.push(Stack::convert_constant_to_value(constant)),
                     }
@@ -203,7 +202,7 @@ impl Vm {
                     ip += 1;
                 }
                 Instruction::CallFn(fn_name) => {
-                    let function = self.fns.iter().find(|f| f.name.as_ref() == Some(fn_name));
+                    let function = self.env.borrow_mut().get_function(fn_name, false);
                     if function.is_none() {
                         return Err(VMError::function_not_found(fn_name));
                     }
