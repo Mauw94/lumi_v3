@@ -111,32 +111,6 @@ fn test_fn_with_passed_vars_and_call_fn() {
     assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
 }
 
-// TODO: this should not pass, because the function is declare inside a scope and we call it outside of that scope.
-#[test]
-fn test_declare_fn_inside_scope_call_outside_of_scope() {
-    let mut parser = Parser::new(
-        r#"
-        {
-            fn test(x, y) {
-                x + y;
-            }
-        }
-
-        let x: int -> 2;
-        let y -> 5;
-        test(x, y);
-    "#,
-    );
-    let ast = parser.parse().unwrap();
-    let mut bytecode_generator = BytecodeGenerator::new();
-    let bytecode = bytecode_generator.generate(&ast);
-
-    let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
-
-    assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
-}
-
 #[test]
 fn test_fn_with_return_statement() {
     let mut parser = Parser::new(
