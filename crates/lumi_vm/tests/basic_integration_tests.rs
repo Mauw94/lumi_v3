@@ -136,3 +136,51 @@ fn test_declare_fn_inside_scope_call_outside_of_scope() {
 
     assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
 }
+
+#[test]
+fn test_fn_with_return_statement() {
+    let mut parser = Parser::new(
+        r#"
+        fn test(n) {
+            return n + 1;
+        }
+        
+        print test(5);
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(&bytecode).unwrap();
+
+    assert_eq!(vm.stack.values, vec![Value::Number(6.0)]);
+}
+
+// TODO: doesn't work
+// #[test]
+// fn test_fn_fib() {
+//     let mut parser = Parser::new(
+//         r#"
+//         fn fib(n) {
+//             if n < 2 {
+//                 return 1;
+//             } else {
+//                 return fib(n - 1) + fib(n - 2);
+//             }
+//         }
+
+//         print fib(7);
+//     "#,
+//     );
+//     let ast = parser.parse().unwrap();
+//     let mut bytecode_generator = BytecodeGenerator::new();
+//     let bytecode = bytecode_generator.generate(&ast);
+
+//     println!("{:?}", bytecode.instructions);
+//     let mut vm = Vm::new();
+//     vm.execute(&bytecode).unwrap();
+
+//     assert_eq!(vm.stack.values, vec![Value::Number(13.0)]);
+// }

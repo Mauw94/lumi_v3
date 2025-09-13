@@ -42,6 +42,7 @@ impl Vm {
                         .get(*idx)
                         .cloned()
                         .unwrap_or(Constant::Undefined);
+
                     match constant {
                         Constant::Function(ref f) => {
                             self.env.borrow_mut().add_function(f.clone());
@@ -53,6 +54,7 @@ impl Vm {
                 Instruction::Add => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
+
                     match (a.clone(), b.clone()) {
                         (Value::Number(a), Value::Number(b)) => {
                             self.stack.push(Value::Number(a + b));
@@ -216,13 +218,13 @@ impl Vm {
                     }
                     args.reverse(); // ensure original order
 
+                    // NOTE: not sure if we need locals here?
                     let mut locals = vec![Value::Undefined; 16];
                     for (i, arg) in args.into_iter().enumerate() {
                         locals[i] = arg;
                     }
 
                     let return_ip = ip + 1;
-
                     self.stack.push_frame(Frame {
                         return_ip,
                         arg_count: argc,
@@ -230,6 +232,12 @@ impl Vm {
                         return_instructions: instructions.clone(),
                         locals: locals,
                     });
+
+                    // Add the functions constants to the stack.
+                    for constant in &function.constants {
+                        self.stack
+                            .push(Stack::convert_constant_to_value(constant.clone()));
+                    }
 
                     // Set the instructions to the functions instructions chunk and start from 0 again.
                     // The frame has a pointer and copy of the previous instruction set.
