@@ -3,8 +3,8 @@ use std::io::{Write, stdin, stdout};
 use lumi_test::Engine;
 
 fn main() {
-    let engine = Engine::new();
-    reply(&engine);
+    let mut engine = Engine::new();
+    reply(&mut engine);
 }
 
 fn prompt(input: &mut String) -> bool {
@@ -20,8 +20,8 @@ fn prompt(input: &mut String) -> bool {
     }
 }
 
-// NOTE & TODO: right now there is no way to keep an environment alive for subsequent lines.
-fn reply(engine: &Engine) {
+// TODO: make a built-in function call to show all variables in the current environment.
+fn reply(engine: &mut Engine) {
     let mut input = String::new();
     while prompt(&mut input) {
         match engine.evaluate(&input) {
