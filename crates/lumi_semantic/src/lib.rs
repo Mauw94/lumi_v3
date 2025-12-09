@@ -2,7 +2,7 @@ use lumi_ast::Node;
 
 use crate::errors::SemanticError;
 
-mod analyzer;
+pub mod analyzer;
 mod errors;
 mod scope;
 mod types;

@@ -20,6 +20,7 @@ pub struct SemanticAnalyzer {
 impl SemanticAnalyzer {
     /// Create a new semantic analyzer with an initial global scope
     pub fn new() -> Self {
+        println!("Initializing Semantic Analyzer");
         let mut analyzer = Self {
             scope_stack: Vec::new(),
             errors: Vec::new(),
@@ -72,6 +73,7 @@ impl SemanticAnalyzer {
     fn vist_identifier(&mut self, id: &str) -> SemanticResult<Type> {
         let current_scope = self.scope_stack.last().unwrap();
 
+        // NOTE: identifier can be a function call. Check both variable and function scopes.
         if let Some(var_type) = current_scope.get_variable_type(id) {
             Ok(var_type)
         } else {

@@ -6,7 +6,7 @@ use crate::types::Type;
 #[derive(Debug, Clone)]
 pub struct Scope {
     /// Variables declared in this scope
-    variables: HashMap<String, VariableInfo>,
+    pub variables: HashMap<String, VariableInfo>,
 
     /// Functions declared in this scope
     functions: HashMap<String, FunctionInfo>,
