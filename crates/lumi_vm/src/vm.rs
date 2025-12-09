@@ -232,12 +232,17 @@ impl Vm {
                         return_instructions: instructions.clone(),
                         locals: locals,
                     });
-
+                    
+                    // NOTE: calling a function adds its constants to the stack. 
+                    // So when we call the function multiple times we add the same constants again and again.
+                    
                     // Add the functions constants to the stack.
                     for constant in &function.constants {
                         self.stack
                             .push(Stack::convert_constant_to_value(constant.clone()));
                     }
+
+                    println!("Stack after pushing frame: {:?}", self.stack);
 
                     // Set the instructions to the functions instructions chunk and start from 0 again.
                     // The frame has a pointer and copy of the previous instruction set.
