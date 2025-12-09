@@ -26,11 +26,9 @@ impl Engine {
             .analyze(&ast)
             .map_err(|e| format!("Semantic error: {e}"))?;
 
-        let mut bytecode_generator = BytecodeGenerator::new();
-        let bytecode = bytecode_generator.generate(&ast);
+        let bytecode = self.bytecode_generator.generate(&ast);
 
-        let mut vm = Vm::new();
-        vm.execute(&bytecode).unwrap();
+        self.vm.execute(&bytecode).unwrap();
 
         Ok(())
     }
