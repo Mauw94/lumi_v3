@@ -54,7 +54,7 @@ fn test_variables_and_print() {
         let x: int -> 5;
         let y: int -> 15;
 
-        print x * y;
+        x * y;
     "#,
     );
     let ast = parser.parse().unwrap();
@@ -119,7 +119,7 @@ fn test_fn_with_return_statement() {
             return n + 1;
         }
         
-        print test(5);
+        test(5);
     "#,
     );
     let ast = parser.parse().unwrap();
