@@ -16,7 +16,7 @@ fn test_execute_basic_add() {
         ],
     };
 
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
     assert_eq!(vm.stack.values, vec![Value::Number(8.0)]); // Check if the result is 8.0
 }
 
@@ -32,7 +32,7 @@ fn test_store_and_load_var_variable() {
         constants: vec![Constant::Number(42.0)], // Constant at index 0
     };
 
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // Check if the variable holds 42.0
 }
 
@@ -49,7 +49,7 @@ fn test_print_statement() {
         constants: vec![Constant::Number(42.0)], // Constant at index 0
     };
 
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // Check if the variable holds 42.0
 }
 
@@ -76,7 +76,7 @@ fn test_fn_statement() {
             Constant::Function(FunctionObj {
                 name: Some("test".to_string()),
                 arity: 2,
-                chunk: vec![
+                instructions: vec![
                     Instruction::LoadVar(0),
                     Instruction::LoadVar(1),
                     Instruction::Add,
@@ -89,6 +89,6 @@ fn test_fn_statement() {
         ],
     };
 
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
     assert_eq!(vm.stack.values, vec![Value::Number(3.0)]);
 }

@@ -1,10 +1,9 @@
-* declaring and calling function gives semantic error: Undeclared variable "function_name"
-        fn test() { print "123"; }
-        test(); -> error
-= FIXED
+* declaring a function with specific return type (e.g a string)
+then assigning that functions return to a variable with a different type gives a type mismatch error = correct
+then trying to declare that variable again with the correct type gives duplicate declaration message (should not have been declared in the first place)
+then trying to print the wrongfully declared variable panics
 
-* calling function with print also prints previous results of that function call
-    - e.g. fn test(x, y) { return x * y; }
-            print test(2, 5) => 10
-            print (2, 6) => 10, 12
-            ..
+fn test() { return "abc" ;}
+let c: int -> test(); // type mismatch
+let c -> test(); // duplicate declaration messsage
+print c; // panics

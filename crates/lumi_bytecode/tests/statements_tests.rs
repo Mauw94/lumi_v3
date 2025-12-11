@@ -71,7 +71,7 @@ fn test_fn_statement() {
         vec![Constant::Function(FunctionObj {
             name: Some("test".to_string()),
             arity: 2,
-            chunk: vec![
+            instructions: vec![
                 Instruction::LoadVar(0),
                 Instruction::LoadVar(1),
                 Instruction::Add,
@@ -127,7 +127,7 @@ fn test_for_statement_with_function_call() {
             Constant::Function(FunctionObj {
                 name: Some("printSomething".to_string()),
                 arity: 1,
-                chunk: vec![
+                instructions: vec![
                     Instruction::LoadVar(0),
                     Instruction::Print,
                     Instruction::Return
