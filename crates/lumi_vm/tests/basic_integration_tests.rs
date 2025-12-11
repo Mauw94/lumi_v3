@@ -2,6 +2,8 @@ use lumi_bytecode::BytecodeGenerator;
 use lumi_parser::Parser;
 use lumi_vm::{Value, Vm};
 
+// NOTE: using PRINT in the example code will pop the value from the stack,
+// so we avoid using PRINT in these tests to check the final stack state.
 #[test]
 fn test_value_is_number() {
     let mut parser = Parser::new("42");
@@ -132,7 +134,52 @@ fn test_fn_with_return_statement() {
     assert_eq!(vm.stack.values, vec![Value::Number(6.0)]);
 }
 
-// TODO: doesn't work
+#[test]
+fn test_assign_fn_result_to_variable() {
+    let mut parser = Parser::new(
+        r#"
+        fn add(a, b) {
+            return a + b;
+        }
+
+        let result -> add(3, 4);
+        result;
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(bytecode).unwrap();
+
+    assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
+}
+
+#[test]
+fn test_assign_fn_result_to_variable_extended() {
+    let mut parser = Parser::new(
+        r#"
+        fn add(a, b) {
+            return a + b;
+        }
+
+        let result -> add(3, 4);
+        let test -> 2 * result;
+        test;
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(bytecode).unwrap();
+
+    assert_eq!(vm.stack.values, vec![Value::Number(14.0)]);
+}
+
+// TODO: doesn't work yet
 // #[test]
 // fn test_fn_fib() {
 //     let mut parser = Parser::new(
@@ -145,7 +192,7 @@ fn test_fn_with_return_statement() {
 //             }
 //         }
 
-//         print fib(7);
+//         fib(7);
 //     "#,
 //     );
 //     let ast = parser.parse().unwrap();
@@ -154,7 +201,7 @@ fn test_fn_with_return_statement() {
 
 //     println!("{:?}", bytecode.instructions);
 //     let mut vm = Vm::new();
-//     vm.execute(&bytecode).unwrap();
+//     vm.execute(bytecode).unwrap();
 
 //     assert_eq!(vm.stack.values, vec![Value::Number(13.0)]);
 // }
