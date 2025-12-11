@@ -35,7 +35,7 @@ where
             let func_obj = FunctionObj {
                 name: fn_name,
                 arity: decl.params.len(),
-                chunk,
+                instructions: chunk,
                 constants,
             };
 
@@ -64,6 +64,9 @@ where
 
         let func_instructions = std::mem::take(self.instructions());
         let func_constants = std::mem::take(self.constants());
+
+        std::mem::swap(self.instructions(), &mut old_instructions);
+        std::mem::swap(&mut self.constants().values, &mut old_constants);
 
         (func_instructions, func_constants.values)
     }

@@ -11,7 +11,7 @@ fn test_value_is_number() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]);
 }
@@ -25,7 +25,7 @@ fn test_value_is_string() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(
         vm.stack.values,
@@ -42,7 +42,7 @@ fn test_value_is_boolean() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Boolean(true)]);
 }
@@ -62,7 +62,7 @@ fn test_variables_and_print() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(75.0)]);
 }
@@ -83,7 +83,7 @@ fn test_fn_and_call_fn() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(3.0)]);
 }
@@ -106,7 +106,7 @@ fn test_fn_with_passed_vars_and_call_fn() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
 }
@@ -127,7 +127,7 @@ fn test_fn_with_return_statement() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(6.0)]);
 }

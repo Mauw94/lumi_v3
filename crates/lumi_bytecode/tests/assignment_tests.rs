@@ -22,7 +22,7 @@ fn test_call_expression() {
             Constant::Function(FunctionObj {
                 name: Some("test".to_string()),
                 arity: 2,
-                chunk: vec![
+                instructions: vec![
                     Instruction::LoadVar(0),
                     Instruction::LoadVar(1),
                     Instruction::Add,

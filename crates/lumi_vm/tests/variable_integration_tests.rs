@@ -11,7 +11,7 @@ fn store_empty_variable_test() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![]); // No value should be on the stack since x is not initialized
 }
@@ -25,7 +25,7 @@ fn store_and_load_variable_test() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // The variable x should hold the value 42.0
 }
@@ -39,7 +39,7 @@ fn store_and_load_multiple_variables_test() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(
         vm.stack.values,
@@ -56,7 +56,7 @@ fn add_two_number_variables() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(100.0)]); // The result of x + y should be 100.0
 }
@@ -70,7 +70,7 @@ fn subtract_two_number_variables() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(-16.0)]); // The result of x + y should be 100.0
 }
@@ -84,7 +84,7 @@ fn multiply_two_number_variables() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(2436.0)]); // The result of x * y should be 2436.0
 }
@@ -98,7 +98,7 @@ fn divide_two_number_variables() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // The result of x / y should be 42.0
 }
@@ -119,7 +119,7 @@ fn test_reassigning_variables() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     // The result of x * y should be 66.0.
     assert_eq!(vm.stack.values, vec![Value::Number(66.0)]);
@@ -142,7 +142,7 @@ fn test_declaring_reassinging_variables() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     // The result of z and x + y should be 22.0 + 5.0 = 27.0
     assert_eq!(vm.stack.values, vec![Value::Number(27.0)]);

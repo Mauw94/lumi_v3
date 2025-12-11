@@ -20,7 +20,7 @@ fn test_executing_many_variable_declarations() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     let duration = start.elapsed();
     println!(
@@ -58,7 +58,7 @@ fn test_executing_simple_function_many_times() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     let duration = start.elapsed();
     println!("Time taken to execute function calls: {:?}", duration);

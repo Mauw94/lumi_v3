@@ -11,7 +11,7 @@ fn test_print_statement() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // The variable x should hold the value 42.0
 }
@@ -33,7 +33,7 @@ fn test_if_jump_true_statement() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::String("ok".to_string())]);
 }
@@ -55,7 +55,7 @@ fn test_if_jump_false_statement() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![Value::String("not ok".to_string())]);
 }
@@ -77,7 +77,7 @@ fn test_for_statement_with_function_call() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(vm.stack.values, vec![]);
 }
@@ -98,7 +98,7 @@ fn test_calling_fn_twice() {
     let bytecode = bytecode_generator.generate(&ast);
 
     let mut vm = Vm::new();
-    vm.execute(&bytecode).unwrap();
+    vm.execute(bytecode).unwrap();
 
     assert_eq!(
         vm.stack.values,

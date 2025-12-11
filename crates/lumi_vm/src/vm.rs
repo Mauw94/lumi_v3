@@ -18,6 +18,8 @@ pub struct Vm {
     pub stack: Stack,
     pub globals: Vec<Value>,
     pub locals: Vec<Value>,
+    instructions: Vec<Instruction>,
+    ip: usize,
 }
 
 impl Vm {
@@ -27,15 +29,18 @@ impl Vm {
             stack: Stack::new(),
             globals: vec![Value::Undefined; 256],
             locals: vec![Value::Undefined; 16],
+            instructions: Vec::new(),
+            ip: 0,
         }
     }
 
-    pub fn execute(&mut self, bytecode: &Bytecode) -> VmResult<()> {
-        let mut ip = 0; // instruction pointer
-        let mut instructions = bytecode.instructions.clone();
+    pub fn execute(&mut self, bytecode: Bytecode) -> VmResult<()> {
+        let start_ip = self.instructions.len();
+        self.instructions = bytecode.instructions;
+        self.ip = start_ip;
 
-        while ip < instructions.len() {
-            match &instructions[ip] {
+        while self.ip < self.instructions.len() {
+            match &self.instructions[self.ip] {
                 Instruction::PushConst(idx) => {
                     let constant = bytecode
                         .constants
@@ -49,7 +54,7 @@ impl Vm {
                         }
                         _ => self.stack.push(Stack::convert_constant_to_value(constant)),
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Add => {
                     let b = self.stack.pop().unwrap();
@@ -65,7 +70,7 @@ impl Vm {
                             self.stack.push(Value::String(format!("{a_str}{b_str}")));
                         }
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Sub => {
                     let b = self.stack.pop().unwrap();
@@ -75,7 +80,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Number(f64::NAN));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Mul => {
                     let b = self.stack.pop().unwrap();
@@ -85,7 +90,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Number(f64::NAN));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Div => {
                     let b = self.stack.pop().unwrap();
@@ -95,19 +100,19 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Number(f64::NAN));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Eq => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
                     self.stack.push(Value::Boolean(a == b));
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Neq => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
                     self.stack.push(Value::Boolean(a != b));
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Lt => {
                     let b = self.stack.pop().unwrap();
@@ -117,7 +122,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Gt => {
                     let b = self.stack.pop().unwrap();
@@ -127,7 +132,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Leq => {
                     let b = self.stack.pop().unwrap();
@@ -137,7 +142,7 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Geq => {
                     let b = self.stack.pop().unwrap();
@@ -147,31 +152,31 @@ impl Vm {
                     } else {
                         self.stack.push(Value::Boolean(false));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::JumpIfTrue(target) => {
                     let cond = self.stack.pop().unwrap();
                     if cond.as_bool().unwrap_or(false) {
-                        ip = *target;
+                        self.ip = *target;
                         continue;
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::JumpIfFalse(target) => {
                     let cond = self.stack.pop().unwrap();
                     if !cond.as_bool().unwrap_or(false) {
-                        ip = *target;
+                        self.ip = *target;
                         continue;
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Jump(target) => {
-                    ip = *target;
+                    self.ip = *target;
                     continue;
                 }
                 Instruction::Pop => {
                     self.stack.pop();
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::StoreVar(index) => {
                     let idx = *index;
@@ -182,7 +187,7 @@ impl Vm {
                     } else {
                         self.locals[idx] = self.stack.values.pop().unwrap();
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::LoadVar(index) => {
                     let idx = *index;
@@ -196,12 +201,12 @@ impl Vm {
                             .map(|v| self.stack.push(v))
                             .unwrap_or_else(|| self.stack.push(Value::Undefined));
                     }
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::Print => {
-                    let value = self.stack.peek().unwrap();
+                    let value = self.stack.pop().unwrap();
                     println!("{:?}", value.to_string());
-                    ip += 1;
+                    self.ip += 1;
                 }
                 Instruction::CallFn(fn_name) => {
                     let function = self.env.borrow_mut().get_function(fn_name, false);
@@ -224,30 +229,25 @@ impl Vm {
                         locals[i] = arg;
                     }
 
-                    let return_ip = ip + 1;
+                    let return_ip = self.ip + 1;
                     self.stack.push_frame(Frame {
                         return_ip,
                         arg_count: argc,
                         base_pointer: 0, // NOTE: atm we don't use base_pointer since our functions don't live on the stack.
-                        return_instructions: instructions.clone(),
+                        return_instructions: self.instructions.clone(),
                         locals: locals,
                     });
-                    
-                    // NOTE: calling a function adds its constants to the stack. 
-                    // So when we call the function multiple times we add the same constants again and again.
-                    
+
                     // Add the functions constants to the stack.
                     for constant in &function.constants {
                         self.stack
                             .push(Stack::convert_constant_to_value(constant.clone()));
                     }
 
-                    println!("Stack after pushing frame: {:?}", self.stack);
-
                     // Set the instructions to the functions instructions chunk and start from 0 again.
                     // The frame has a pointer and copy of the previous instruction set.
-                    instructions = function.chunk.clone();
-                    ip = 0;
+                    self.instructions = function.instructions.clone();
+                    self.ip = 0;
                 }
                 Instruction::Return => {
                     let frame = self.stack.frames.pop().unwrap();
@@ -266,10 +266,10 @@ impl Vm {
                         self.stack.values.push(ret);
                     }
 
-                    instructions = frame.return_instructions;
-                    ip = frame.return_ip;
+                    self.instructions = frame.return_instructions;
+                    self.ip = frame.return_ip;
                 }
-                _ => unimplemented!(), // Placeholder for other instructions
+                _ => self.ip += 1,
             }
         }
         Ok(())

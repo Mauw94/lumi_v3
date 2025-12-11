@@ -28,7 +28,7 @@ impl Engine {
 
         let bytecode = self.bytecode_generator.generate(&ast);
 
-        self.vm.execute(&bytecode).unwrap();
+        self.vm.execute(bytecode).unwrap();
 
         Ok(())
     }

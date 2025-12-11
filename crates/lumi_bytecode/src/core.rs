@@ -14,7 +14,7 @@ pub struct Env {
 pub struct FunctionObj {
     pub name: Option<String>,
     pub arity: usize,
-    pub chunk: Vec<Instruction>,
+    pub instructions: Vec<Instruction>,
     pub constants: Vec<Constant>,
 }
 
