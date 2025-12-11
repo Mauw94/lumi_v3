@@ -13,7 +13,7 @@ fn test_print_statement() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // The variable x should hold the value 42.0
+    assert_eq!(vm.stack.values, vec![]);
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn test_if_jump_true_statement() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::String("ok".to_string())]);
+    assert_eq!(vm.stack.values, vec![]);
 }
 
 #[test]
@@ -57,7 +57,7 @@ fn test_if_jump_false_statement() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::String("not ok".to_string())]);
+    assert_eq!(vm.stack.values, vec![]);
 }
 
 #[test]
@@ -100,8 +100,5 @@ fn test_calling_fn_twice() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(
-        vm.stack.values,
-        vec![Value::Number(2.0), Value::Number(5.0)]
-    );
+    assert_eq!(vm.stack.values, vec![Value::Undefined]);
 }

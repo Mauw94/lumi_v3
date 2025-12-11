@@ -132,7 +132,7 @@ fn test_declaring_reassinging_variables() {
         let y -> 2;
         x -> 22;
         let z -> 5;
-        print x + z;
+        x + z;
         
     "#;
     let mut parser = Parser::new(source);

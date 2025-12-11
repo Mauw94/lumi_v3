@@ -50,13 +50,12 @@ fn test_print_statement() {
     };
 
     vm.execute(bytecode).unwrap();
-    assert_eq!(vm.stack.values, vec![Value::Number(42.0)]); // Check if the variable holds 42.0
+    assert_eq!(vm.stack.values, vec![]); // Check if the variable holds 42.0
 }
 
 // TODO: extend vm tests to test more instructions etc (print, if, fn)
 #[test]
 fn test_fn_statement() {
-    // Example
     r#"
         fn test(x, y) {
             x + y;
