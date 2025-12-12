@@ -52,6 +52,7 @@ impl SemanticAnalyzer {
             Node::BlockStatement(stmt) => self.visit_block_statement(stmt),
             Node::FunctionDeclaration(fn_decl) => self.visit_function_declaration(fn_decl),
             Node::CallExpression(expr) => self.visit_call_expression(expr),
+            Node::PrintStatement(stmt) => self.visit_print_statement(stmt),
             // Node::BinaryExpression(expr) => self.visit_binary_expression(expr),
             Node::String(_) => Ok(Type::String),
             Node::Boolean(_) => Ok(Type::Boolean),
@@ -92,7 +93,7 @@ impl SemanticAnalyzer {
         let is_const = decl.kind == "const";
 
         for var_decl in &decl.declarations {
-            if let Node::Identifier(var_name) = &*var_decl.id {
+            if let Node::Identifier(var_name) = &*var_decl.var_name {
                 // Get the type
                 let var_type = if let Some(var_type_node) = &var_decl.var_type {
                     // Get type from the type annotation
@@ -101,7 +102,7 @@ impl SemanticAnalyzer {
                     if let Some(init) = &var_decl.init {
                         let init_type = self.visit_node(init)?;
                         if init_type != var_declared_type {
-                            self.errors.push(SemanticError::TypeMismatch {
+                            return Err(SemanticError::TypeMismatch {
                                 expected: var_declared_type.to_string(),
                                 found: init_type.to_string(),
                                 position: decl.span.as_ref().map(|s| s.start.clone()),
@@ -285,6 +286,12 @@ impl SemanticAnalyzer {
             self.scope_stack.pop();
         }
 
+        Ok(Type::Undefined)
+    }
+
+    /// Visit print statement
+    fn visit_print_statement(&mut self, stmt: &node::PrintStatement) -> SemanticResult<Type> {
+        self.visit_node(&stmt.argument)?;
         Ok(Type::Undefined)
     }
 

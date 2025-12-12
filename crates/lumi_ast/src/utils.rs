@@ -29,7 +29,7 @@ pub fn create_variable_declaration(
     Node::VariableDeclaration(VariableDeclaration {
         kind: kind.to_string(),
         declarations: vec![VariableDeclarator {
-            id: Box::new(create_identifier(name)),
+            var_name: Box::new(create_identifier(name)),
             var_type: var_type
                 .is_some()
                 .then(|| Box::new(create_identifier(var_type.unwrap()))),
@@ -53,7 +53,7 @@ pub fn create_multiple_variable_declarations(
         kind: kind.to_string(),
         declarations: vec![
             VariableDeclarator {
-                id: Box::new(create_identifier(name1)),
+                var_name: Box::new(create_identifier(name1)),
                 var_type: var_type1
                     .is_some()
                     .then(|| Box::new(create_identifier(var_type1.unwrap()))),
@@ -61,7 +61,7 @@ pub fn create_multiple_variable_declarations(
                 span: None,
             },
             VariableDeclarator {
-                id: Box::new(create_identifier(name2)),
+                var_name: Box::new(create_identifier(name2)),
                 var_type: var_type2
                     .is_some()
                     .then(|| Box::new(create_identifier(var_type2.unwrap()))),

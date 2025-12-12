@@ -82,7 +82,7 @@ impl Visitor for NodeCounter {
             }
             Node::VariableDeclaration(decl) => {
                 for var_decl in &decl.declarations {
-                    self.visit_node(&var_decl.id);
+                    self.visit_node(&var_decl.var_name);
                     if let Some(init) = &var_decl.init {
                         self.visit_node(init);
                     }

@@ -18,14 +18,14 @@ where
     fn generate_variable_declaration(&mut self, node: &Node) {
         if let Node::VariableDeclaration(decl) = node {
             for var in &decl.declarations {
-                if let Node::Identifier(name) = &*var.id {
+                if let Node::Identifier(name) = &*var.var_name {
                     if let Some(init) = &var.init {
                         self.visit_node(init);
                         let local_idx = self.get_or_create_local(name);
                         self.instructions().push(Instruction::StoreVar(local_idx));
                     } else {
+                        // TODO: support undefined initialization
                         // let local_idx = self.get_or_create_local(name);
-                        // TODO: do we do this?
                         // self.instructions().push(Instruction::PushUndefined);
                         // self.instructions().push(Instruction::StoreVar(local_idx));
                     }

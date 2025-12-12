@@ -317,7 +317,7 @@ impl Parser {
             };
             let span = self.create_span_from_tokens();
             declarations.push(VariableDeclarator {
-                id: Box::new(id),
+                var_name: Box::new(id),
                 var_type: var_type.map(Box::new),
                 init: init,
                 span: Some(span),
