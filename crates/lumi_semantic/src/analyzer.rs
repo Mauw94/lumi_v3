@@ -102,6 +102,7 @@ impl SemanticAnalyzer {
                     if let Some(init) = &var_decl.init {
                         let init_type = self.visit_node(init)?;
                         if init_type != var_declared_type {
+                            // Have to return here otherwise we still declare the variable even though there's a type mismatch
                             return Err(SemanticError::TypeMismatch {
                                 expected: var_declared_type.to_string(),
                                 found: init_type.to_string(),
