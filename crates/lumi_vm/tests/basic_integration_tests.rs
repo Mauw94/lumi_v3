@@ -95,7 +95,7 @@ fn test_fn_with_passed_vars_and_call_fn() {
     let mut parser = Parser::new(
         r#"
         fn test(x, y) {
-            x + y;
+            return x + y;
         }
 
         let x: int -> 2;
@@ -135,6 +135,29 @@ fn test_fn_with_return_statement() {
 }
 
 #[test]
+fn test_fn_with_passed_variable() {
+    let mut parser = Parser::new(
+        r#"
+        let a: int -> 5;
+        fn test(n) {
+            return n * 2;
+        }
+        
+        let result -> test(a);
+        result;
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    let mut vm = Vm::new();
+    vm.execute(bytecode).unwrap();
+
+    assert_eq!(vm.stack.values, vec![Value::Number(10.0)]);
+}
+
+#[test]
 fn test_assign_fn_result_to_variable() {
     let mut parser = Parser::new(
         r#"
@@ -164,9 +187,8 @@ fn test_assign_fn_result_to_variable_extended() {
             return a + b;
         }
 
-        let result -> add(3, 4);
-        let test -> 2 * result;
-        test;
+        let result: int -> add(3, 4);
+        result * 2;
     "#,
     );
     let ast = parser.parse().unwrap();
@@ -176,7 +198,7 @@ fn test_assign_fn_result_to_variable_extended() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::Number(14.0)]);
+    assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
 }
 
 // TODO: doesn't work yet

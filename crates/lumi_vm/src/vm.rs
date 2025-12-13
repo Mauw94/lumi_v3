@@ -19,6 +19,7 @@ pub struct Vm {
     pub globals: Vec<Value>,
     pub locals: Vec<Value>,
     instructions: Vec<Instruction>,
+    constants: Vec<Constant>,
     ip: usize,
 }
 
@@ -30,6 +31,7 @@ impl Vm {
             globals: vec![Value::Undefined; 256],
             locals: vec![Value::Undefined; 16],
             instructions: Vec::new(),
+            constants: Vec::new(),
             ip: 0,
         }
     }
@@ -37,12 +39,13 @@ impl Vm {
     pub fn execute(&mut self, bytecode: Bytecode) -> VmResult<()> {
         let start_ip = self.instructions.len();
         self.instructions = bytecode.instructions;
+        self.constants = bytecode.constants;
         self.ip = start_ip;
 
         while self.ip < self.instructions.len() {
             match &self.instructions[self.ip] {
                 Instruction::PushConst(idx) => {
-                    let constant = bytecode
+                    let constant = self
                         .constants
                         .get(*idx)
                         .cloned()
@@ -238,15 +241,10 @@ impl Vm {
                         locals: locals,
                     });
 
-                    // Add the functions constants to the stack.
-                    for constant in &function.constants {
-                        self.stack
-                            .push(Stack::convert_constant_to_value(constant.clone()));
-                    }
-
                     // Set the instructions to the functions instructions chunk and start from 0 again.
                     // The frame has a pointer and copy of the previous instruction set.
                     self.instructions = function.instructions.clone();
+                    self.constants = function.constants.clone();
                     self.ip = 0;
                 }
                 Instruction::Return => {

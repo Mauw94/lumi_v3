@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use lumi_ast::{FunctionDeclaration, Node};
 
 use crate::{
@@ -14,6 +16,9 @@ pub trait FunctionGenerator {
 
 pub trait FunctionCore {
     fn instructions(&mut self) -> &mut Vec<Instruction>;
+    fn symbol_table(&mut self) -> &mut HashMap<String, usize>;
+    fn next_label_id(&self) -> usize;
+    fn set_next_local(&mut self, next: usize);
     fn constants(&mut self) -> &mut ConstantPool;
     fn visit_node(&mut self, node: &Node);
 }
@@ -50,9 +55,13 @@ where
     ) -> (Vec<Instruction>, Vec<Constant>) {
         let mut old_instructions = Vec::new();
         let mut old_constants = Vec::new();
+        let mut old_locals = HashMap::new();
+        let old_next_label = self.next_label_id();
 
         std::mem::swap(&mut old_instructions, self.instructions());
         std::mem::swap(&mut old_constants, &mut self.constants().values);
+        std::mem::swap(&mut old_locals, &mut self.symbol_table());
+        self.set_next_local(0);
 
         for param in &decl.params {
             self.visit_node(param);
@@ -67,6 +76,8 @@ where
 
         std::mem::swap(self.instructions(), &mut old_instructions);
         std::mem::swap(&mut self.constants().values, &mut old_constants);
+        std::mem::swap(self.symbol_table(), &mut old_locals);
+        self.set_next_local(old_next_label);
 
         (func_instructions, func_constants.values)
     }

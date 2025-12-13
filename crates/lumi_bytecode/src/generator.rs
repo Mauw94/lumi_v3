@@ -175,6 +175,18 @@ impl FunctionCore for BytecodeGenerator {
     fn constants(&mut self) -> &mut ConstantPool {
         &mut self.constants
     }
+
+    fn symbol_table(&mut self) -> &mut HashMap<String, usize> {
+        &mut self.symbol_table
+    }
+
+    fn next_label_id(&self) -> usize {
+        self.next_label_id
+    }
+
+    fn set_next_local(&mut self, next: usize) {
+        self.next_label_id = next;
+    }
 }
 
 impl ControlFlowCore for BytecodeGenerator {
