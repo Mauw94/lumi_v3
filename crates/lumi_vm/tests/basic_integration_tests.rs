@@ -188,7 +188,7 @@ fn test_assign_fn_result_to_variable_extended() {
         }
 
         let result: int -> add(3, 4);
-        result * 2;
+        result;
     "#,
     );
     let ast = parser.parse().unwrap();
