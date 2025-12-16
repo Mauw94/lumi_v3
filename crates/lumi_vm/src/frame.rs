@@ -1,4 +1,4 @@
-use lumi_bytecode::Instruction;
+use lumi_bytecode::{Constant, Instruction};
 
 use crate::Value;
 
@@ -9,6 +9,7 @@ pub struct Frame {
     pub base_pointer: usize,
     pub arg_count: usize,
     pub return_instructions: Vec<Instruction>,
+    pub return_constants: Vec<Constant>,
     pub locals: Vec<Value>,
 }
 
@@ -19,6 +20,7 @@ impl Frame {
             base_pointer: 0,
             arg_count: 0,
             return_instructions: Vec::new(),
+            return_constants: Vec::new(),
             locals: Vec::new(),
         }
     }

@@ -1,10 +1,11 @@
+--------------------------------------------------------------------------
+
     r#"
-        fn add(a, b) {
-            return a + b;
+        fn test(a) { 
+            return test(a - 1);
         }
+    "#
 
-        let result: int -> add(3, 4);
-        result * 2;
-    "#,
+    this results in error: Undeclared variable 'test'
 
-    this results in a value of String("7undefined") on the stack.
+-----------------------------------------------------------------------------

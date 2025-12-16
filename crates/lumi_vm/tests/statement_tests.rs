@@ -1,6 +1,6 @@
 use lumi_bytecode::BytecodeGenerator;
 use lumi_parser::Parser;
-use lumi_vm::{Value, Vm};
+use lumi_vm::Vm;
 
 #[test]
 fn test_print_statement() {
@@ -91,6 +91,7 @@ fn test_calling_fn_twice() {
         }
         printSomething(2);
         printSomething(5);
+        printSomething(7);
     "#,
     );
     let ast = parser.parse().unwrap();
@@ -100,5 +101,5 @@ fn test_calling_fn_twice() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::Undefined]);
+    assert_eq!(vm.stack.values, vec![]);
 }

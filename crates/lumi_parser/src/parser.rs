@@ -12,13 +12,13 @@ use crate::{
 
 /// Main parser struct that holds the source code, lexer, and parsing state
 pub struct Parser {
-    source: String,
+    _source: String,
+    _strict_mode: bool,
     lexer: Lexer,
     current: Option<Token>,
     previous: Option<Token>,
     error_recovery: ErrorRecovery,
     context: ParsingContext,
-    strict_mode: bool,
 }
 
 impl Parser {
@@ -33,13 +33,13 @@ impl Parser {
         };
 
         Self {
-            source: source.to_string(),
+            _source: source.to_string(),
+            _strict_mode: false,
             lexer,
             current,
             previous: None,
             error_recovery: ErrorRecovery::default(),
             context: ParsingContext::TopLevel,
-            strict_mode: false,
         }
     }
 

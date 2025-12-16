@@ -186,9 +186,10 @@ fn test_assign_fn_result_to_variable_extended() {
         fn add(a, b) {
             return a + b;
         }
-
         let result: int -> add(3, 4);
-        result;
+        let a: int  -> 2;
+
+        result + a;
     "#,
     );
     let ast = parser.parse().unwrap();
@@ -198,7 +199,7 @@ fn test_assign_fn_result_to_variable_extended() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::Number(7.0)]);
+    assert_eq!(vm.stack.values, vec![Value::Number(9.0)]);
 }
 
 // TODO: doesn't work yet

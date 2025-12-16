@@ -238,6 +238,7 @@ impl Vm {
                         arg_count: argc,
                         base_pointer: 0, // NOTE: atm we don't use base_pointer since our functions don't live on the stack.
                         return_instructions: self.instructions.clone(),
+                        return_constants: self.constants.clone(),
                         locals: locals,
                     });
 
@@ -250,14 +251,14 @@ impl Vm {
                 Instruction::Return => {
                     let frame = self.stack.frames.pop().unwrap();
 
-                    let ret = if self.stack.values.len() > frame.base_pointer + 1 {
+                    let ret = if self.stack.values.len() > 0 {
                         self.stack.pop().unwrap()
                     } else {
                         Value::Undefined
                     };
 
                     // Leave the callee (function) on the stack.
-                    self.stack.values.truncate(frame.base_pointer + 1);
+                    // self.stack.values.truncate(frame.base_pointer); // NOTE: base_pointer is 0 here so this doesn't matter.
 
                     // Push the return value
                     if ret != Value::Undefined {
@@ -265,6 +266,7 @@ impl Vm {
                     }
 
                     self.instructions = frame.return_instructions;
+                    self.constants = frame.return_constants;
                     self.ip = frame.return_ip;
                 }
                 _ => self.ip += 1,
