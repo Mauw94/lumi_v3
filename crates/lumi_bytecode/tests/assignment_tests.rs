@@ -52,9 +52,26 @@ fn test_plus_assign_expression() {
 
     assert_eq!(
         bytecode.constants,
-        vec![
-            Constant::Number(5.0),
-            Constant::Number(2.0),
-        ]
+        vec![Constant::Number(5.0), Constant::Number(1.0),]
+    );
+}
+
+#[test]
+fn test_minus_assign_expression() {
+    let mut parser = Parser::new(
+        r#"
+        let x: int -> 5;
+        x -= 1;
+
+        x;
+    "#,
+    );
+    let ast = parser.parse().unwrap();
+    let mut bytecode_generator = BytecodeGenerator::new();
+    let bytecode = bytecode_generator.generate(&ast);
+
+    assert_eq!(
+        bytecode.constants,
+        vec![Constant::Number(5.0), Constant::Number(1.0),]
     );
 }

@@ -778,6 +778,7 @@ impl Parser {
                 TokenKind::GreaterThan => ">".to_string(),
                 TokenKind::LessThanEqual => "<=".to_string(),
                 TokenKind::PlusAssign => "+=".to_string(),
+                TokenKind::MinusAssign => "-=".to_string(),
                 TokenKind::GreaterThanEqual => ">=".to_string(),
                 TokenKind::Increment => "++".to_string(),
                 TokenKind::Decrement => "--".to_string(),

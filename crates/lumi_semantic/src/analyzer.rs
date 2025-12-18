@@ -255,6 +255,15 @@ impl SemanticAnalyzer {
                             });
                         }
                     }
+                    "-=" => {
+                        if !self.can_subtract_types(var_type, &value_type) {
+                            self.errors.push(SemanticError::InvalidOperation {
+                                operation: "-=".to_string(),
+                                type_name: var_type.to_string(),
+                                position: expr.span.as_ref().map(|s| s.start.clone()),
+                            });
+                        }
+                    }
                     _ => {
                         self.errors.push(SemanticError::UnsupportedOperator {
                             operator: expr.operator.clone(),
@@ -273,6 +282,10 @@ impl SemanticAnalyzer {
             (left, right),
             (Type::Number, Type::Number) | (Type::String, Type::String)
         )
+    }
+
+    fn can_subtract_types(&self, left: &Type, right: &Type) -> bool {
+        matches!((left, right), (Type::Number, Type::Number))
     }
 
     fn visit_expression_statement(
