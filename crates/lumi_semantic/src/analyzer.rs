@@ -237,17 +237,43 @@ impl SemanticAnalyzer {
             }
 
             if let Some(var_type) = self.type_env.get_type(var_name) {
-                if *var_type != value_type {
-                    self.errors.push(SemanticError::TypeMismatch {
-                        expected: var_type.to_string(),
-                        found: value_type.to_string(),
-                        position: expr.span.as_ref().map(|s| s.start.clone()),
-                    });
+                match expr.operator.as_str() {
+                    "=" => {
+                        if *var_type != value_type {
+                            self.errors.push(SemanticError::TypeMismatch {
+                                expected: var_type.to_string(),
+                                found: value_type.to_string(),
+                                position: expr.span.as_ref().map(|s| s.start.clone()),
+                            });
+                        }
+                    }
+                    "+=" => {
+                        if !self.can_add_types(var_type, &value_type) {
+                            self.errors.push(SemanticError::InvalidOperation {
+                                operation: "+=".to_string(),
+                                type_name: var_type.to_string(),
+                                position: expr.span.as_ref().map(|s| s.start.clone()),
+                            });
+                        }
+                    }
+                    _ => {
+                        self.errors.push(SemanticError::UnsupportedOperator {
+                            operator: expr.operator.clone(),
+                            position: expr.span.as_ref().map(|s| s.start.clone()),
+                        });
+                    }
                 }
             }
         }
 
         Ok(value_type)
+    }
+
+    fn can_add_types(&self, left: &Type, right: &Type) -> bool {
+        matches!(
+            (left, right),
+            (Type::Number, Type::Number) | (Type::String, Type::String)
+        )
     }
 
     fn visit_expression_statement(

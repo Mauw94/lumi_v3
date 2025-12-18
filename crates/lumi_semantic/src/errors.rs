@@ -64,6 +64,12 @@ pub enum SemanticError {
         type_name: String,
         position: Option<Position>,
     },
+
+    /// Unsuported operator in assignment expression
+    UnsupportedOperator {
+        operator: String,
+        position: Option<Position>,
+    },
 }
 
 impl std::fmt::Display for SemanticError {
@@ -158,6 +164,13 @@ impl std::fmt::Display for SemanticError {
                     "Invalid operation '{}' on type '{}'",
                     operation, type_name
                 )?;
+                if let Some(pos) = position {
+                    write!(f, " at line {}, column {}", pos.line, pos.column)?;
+                }
+                Ok(())
+            }
+            SemanticError::UnsupportedOperator { operator, position } => {
+                write!(f, "Unsuported operator found '{}'", operator)?;
                 if let Some(pos) = position {
                     write!(f, " at line {}, column {}", pos.line, pos.column)?;
                 }
