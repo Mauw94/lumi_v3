@@ -23,11 +23,33 @@ where
                 _ => unreachable!(), // TODO: should also give an informative error
             };
 
-            // TODO: remove unused constants by doing a compiler pass after byte code generation.
-            self.visit_node(&expr.right);
-
             let idx = self.get_or_create_local(&var_name);
-            self.instructions().push(Instruction::StoreVar(idx));
+
+            if expr.operator == "+=" {
+                // Load current value of the variable
+                self.instructions().push(Instruction::LoadVar(idx));
+                // Visit right-hand side (pushes its value onto stack)
+                self.visit_node(&expr.right);
+                // Add the two values
+                self.instructions().push(Instruction::Add);
+                // Store the result back
+                self.instructions().push(Instruction::StoreVar(idx));
+            } else if expr.operator == "-=" {
+                // Load current value of the variable
+                self.instructions().push(Instruction::LoadVar(idx));
+                // Visit right-hand side (pushes its value onto stack)
+                self.visit_node(&expr.right);
+                // Add the two values
+                self.instructions().push(Instruction::Sub);
+                // Store the result back
+                self.instructions().push(Instruction::StoreVar(idx));
+            } else {
+                // For simple assignment (=), just visit right and store
+                self.visit_node(&expr.right);
+                self.instructions().push(Instruction::StoreVar(idx));
+            }
+
+            // TODO: remove unused constants by doing a compiler pass after byte code generation.
         }
     }
 

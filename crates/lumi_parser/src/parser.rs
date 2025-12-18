@@ -671,9 +671,12 @@ impl Parser {
         if let Some(token) = &self.current {
             matches!(
                 token.kind,
-                TokenKind::Arrow | TokenKind::Assign // TODO: add those when we implement them
-                                                     // | TokenKind::PlusAssign | TokenKind::MinusAssign
-                                                     // TokenKind::MultiplyAssign | TokenKind::DivideAssign | TokenKind::ModuloAssign |
+                TokenKind::Arrow
+                    | TokenKind::Assign
+                    | TokenKind::PlusAssign
+                    | TokenKind::MinusAssign // TODO: add those when we implement them
+                                             // | TokenKind::PlusAssign | TokenKind::MinusAssign
+                                             // TokenKind::MultiplyAssign | TokenKind::DivideAssign | TokenKind::ModuloAssign |
             )
         } else {
             false
@@ -774,6 +777,8 @@ impl Parser {
                 TokenKind::LessThan => "<".to_string(),
                 TokenKind::GreaterThan => ">".to_string(),
                 TokenKind::LessThanEqual => "<=".to_string(),
+                TokenKind::PlusAssign => "+=".to_string(),
+                TokenKind::MinusAssign => "-=".to_string(),
                 TokenKind::GreaterThanEqual => ">=".to_string(),
                 TokenKind::Increment => "++".to_string(),
                 TokenKind::Decrement => "--".to_string(),
