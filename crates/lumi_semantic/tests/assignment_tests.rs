@@ -14,3 +14,18 @@ fn test_invalid_operation_assignment_expression() {
         );
     }
 }
+
+// TODO: doesn't throw an error, lexing stops at +* and does not return a token.
+// #[test]
+// fn test_invalid_operator_assignment_expression() {
+//     let mut parser = Parser::new("let x: int -> 5; x +* 2");
+//     let ast = parser.parse().unwrap();
+//     let result = analyze(&ast);
+//     assert!(result.is_err());
+//     if let Err(e) = result {
+//         assert_eq!(
+//             e.to_string(),
+//             "Unsupported operator found '$' at line 1, column 36"
+//         );
+//     }
+// }

@@ -541,7 +541,7 @@ impl Lexer {
         }
     }
 
-    fn update_positions(&mut self, start_line: usize, start_col: usize) {
+    fn update_positions(&mut self, _start_line: usize, _start_col: usize) {
         // self.line = start_line;
         // self.column = start_col;
         // Position is already updated in next_token

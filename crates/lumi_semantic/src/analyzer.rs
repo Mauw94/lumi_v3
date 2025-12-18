@@ -20,7 +20,6 @@ pub struct SemanticAnalyzer {
 impl SemanticAnalyzer {
     /// Create a new semantic analyzer with an initial global scope
     pub fn new() -> Self {
-        println!("Initializing Semantic Analyzer");
         let mut analyzer = Self {
             scope_stack: Vec::new(),
             errors: Vec::new(),
