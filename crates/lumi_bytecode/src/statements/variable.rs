@@ -24,10 +24,19 @@ where
                         let local_idx = self.get_or_create_local(name);
                         self.instructions().push(Instruction::StoreVar(local_idx));
                     } else {
-                        // TODO: support undefined initialization
-                        // let local_idx = self.get_or_create_local(name);
-                        // self.instructions().push(Instruction::PushUndefined);
-                        // self.instructions().push(Instruction::StoreVar(local_idx));
+                        // NOTE: move to something shared. core?
+                        if let Some(var_type) = &var.var_type {
+                            match &**var_type {
+                                Node::Identifier(id) => match id.to_string().as_str() {
+                                    "int" => self.visit_node(&Node::Number(0.0)),
+                                    "str" => self.visit_node(&Node::String("".to_string())),
+                                    _ => {}
+                                },
+                                _ => {}
+                            }
+                        }
+                        let local_idx = self.get_or_create_local(name);
+                        self.instructions().push(Instruction::StoreVar(local_idx));
                     }
                 }
             }

@@ -116,7 +116,10 @@ impl SemanticAnalyzer {
                     // Infer type from initializer
                     self.visit_node(init)?
                 } else {
-                    Type::Undefined // Default type if no initializer and no type annotation
+                    return Err(SemanticError::InvalidVariableDeclaration {
+                        name: var_name.to_string(),
+                        position: decl.span.as_ref().map(|s| s.start.clone()),
+                    });
                 };
 
                 // Get mutable reference to the current scope
