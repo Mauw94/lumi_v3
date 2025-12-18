@@ -138,3 +138,20 @@ fn test_variable_declaration() {
     assert_eq!(tokens[4].kind, TokenKind::Arrow);
     assert_eq!(tokens[5].kind, TokenKind::Number(42.0));
 }
+
+#[test]
+fn test_plus_assign() {
+    let source = "let x: int -> 42; x += 1;";
+    let tokens = tokenize(source).unwrap();
+
+    assert_eq!(tokens.len(), 12); // let + identifier + colon + identifier + assign + number + semicolon + EOF
+    assert_eq!(tokens[0].kind, TokenKind::Keyword("let".to_string()));
+    assert_eq!(tokens[1].kind, TokenKind::Identifier("x".to_string()));
+    assert_eq!(tokens[2].kind, TokenKind::Colon);
+    assert_eq!(tokens[3].kind, TokenKind::Keyword("int".to_string()));
+    assert_eq!(tokens[4].kind, TokenKind::Arrow);
+    assert_eq!(tokens[5].kind, TokenKind::Number(42.0));
+    assert_eq!(tokens[7].kind, TokenKind::Identifier("x".to_string()));
+    assert_eq!(tokens[8].kind, TokenKind::PlusAssign);
+    assert_eq!(tokens[9].kind, TokenKind::Number(1.0));
+}

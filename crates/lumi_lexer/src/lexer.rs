@@ -363,6 +363,11 @@ impl Lexer {
                     self.advance();
                     return Ok(TokenKind::GreaterThanEqual);
                 }
+                "+=" => {
+                    self.advance();
+                    self.advance();
+                    return Ok(TokenKind::PlusAssign);
+                }
                 "++" => {
                     self.advance();
                     self.advance();
