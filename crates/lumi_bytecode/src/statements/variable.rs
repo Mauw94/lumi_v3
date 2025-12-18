@@ -24,12 +24,12 @@ where
                         let local_idx = self.get_or_create_local(name);
                         self.instructions().push(Instruction::StoreVar(local_idx));
                     } else {
-                        // NOTE: move to something shared. core?
                         if let Some(var_type) = &var.var_type {
                             match &**var_type {
                                 Node::Identifier(id) => match id.to_string().as_str() {
                                     "int" => self.visit_node(&Node::Number(0.0)),
                                     "str" => self.visit_node(&Node::String("".to_string())),
+                                    "bool" => self.visit_node(&Node::Boolean(false)),
                                     _ => {}
                                 },
                                 _ => {}
