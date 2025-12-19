@@ -125,7 +125,7 @@ impl Lexer {
             | "try" | "catch" | "finally" | "throw" | "break" | "continue" | "switch" | "case"
             | "default" | "for" | "while" | "do" | "in" | "of" | "with" | "delete"
             | "instanceof" | "typeof" | "void" | "debugger" | "enum" | "interface" | "package"
-            | "private" | "protected" | "public" | "implements" | "abstract" | "boolean"
+            | "private" | "protected" | "public" | "implements" | "abstract" | "bool"
             | "byte" | "char" | "double" | "final" | "float" | "goto" | "int" | "long" | "str"
             | "native" | "short" | "synchronized" | "throws" | "transient" | "volatile" | "to"
             | "step" | "print" => Ok(TokenKind::Keyword(identifier)),

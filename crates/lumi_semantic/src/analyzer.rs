@@ -389,7 +389,7 @@ impl SemanticAnalyzer {
                 "int" => Ok(Type::Number),
                 // "float" => Some(Type::Float), // TODO: implement when adding float type
                 "str" => Ok(Type::String),
-                "boolean" => Ok(Type::Boolean),
+                "bool" => Ok(Type::Boolean),
                 // Add more types as needed
                 _ => Err(SemanticError::InvalidType {
                     type_name: id.to_string(),
