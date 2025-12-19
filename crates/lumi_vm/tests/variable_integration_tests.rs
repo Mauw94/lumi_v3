@@ -13,7 +13,7 @@ fn store_empty_variable_test() {
     let mut vm = Vm::new();
     vm.execute(bytecode).unwrap();
 
-    assert_eq!(vm.stack.values, vec![Value::Number(0.0)]); // Default value for int should be on the stack.
+    assert_eq!(vm.stack.values, vec![]); // No value should be on the stack since x is not initialized
 }
 
 #[test]

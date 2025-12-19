@@ -94,6 +94,33 @@ impl Node {
             _ => panic!("Unexpected node type"),
         }
     }
+
+    pub fn get_default_int_value() -> Self {
+        Node::Number(0.0)
+    }
+
+    pub fn get_default_str_value() -> Self {
+        Node::String("".to_string())
+    }
+
+    pub fn get_default_bool_value() -> Self {
+        Node::Boolean(false)
+    }
+
+    pub fn get_default_value(var_type: &Box<Node>) -> Result<Self, String> {
+        match &**var_type {
+            Node::Identifier(id) => match id.as_str() {
+                "int" => Ok(Node::get_default_int_value()),
+                "str" => Ok(Node::get_default_str_value()),
+                "bool" => Ok(Node::get_default_bool_value()),
+                _ => Err(format!("'{}' is not a valid value type.", id)),
+            },
+            _ => Err(format!(
+                "No identifier was found. Found '{:?}' instead.",
+                var_type
+            )),
+        }
+    }
 }
 
 // Program structure

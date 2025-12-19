@@ -47,7 +47,7 @@ fn test_declare_string_variable() {
 
 #[test]
 fn test_declare_boolean_variable() {
-    let mut parser = Parser::new("let x: boolean -> true;");
+    let mut parser = Parser::new("let x: bool -> true;");
     let ast = parser.parse().unwrap();
     let result = analyze(&ast);
     assert!(result.is_ok());

@@ -25,14 +25,9 @@ where
                         self.instructions().push(Instruction::StoreVar(local_idx));
                     } else {
                         if let Some(var_type) = &var.var_type {
-                            match &**var_type {
-                                Node::Identifier(id) => match id.to_string().as_str() {
-                                    "int" => self.visit_node(&Node::Number(0.0)),
-                                    "str" => self.visit_node(&Node::String("".to_string())),
-                                    "bool" => self.visit_node(&Node::Boolean(false)),
-                                    _ => {}
-                                },
-                                _ => {}
+                            match Node::get_default_value(var_type) {
+                                Ok(node) => self.visit_node(&node),
+                                Err(e) => eprintln!("{}", e),
                             }
                         }
                         let local_idx = self.get_or_create_local(name);
