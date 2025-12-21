@@ -10,7 +10,7 @@ pub enum SemanticError {
         position: Option<Position>,
     },
 
-    /// Variable is declared with type and with initializer
+    /// Variable is declared without type and without initializer
     InvalidVariableDeclaration {
         name: String,
         position: Option<Position>,
