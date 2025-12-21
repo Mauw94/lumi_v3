@@ -10,6 +10,12 @@ pub enum SemanticError {
         position: Option<Position>,
     },
 
+    /// Variable is declared without type and without initializer
+    InvalidVariableDeclaration {
+        name: String,
+        position: Option<Position>,
+    },
+
     /// Variable is declared but not initialized
     UninitializedVariable {
         name: String,
@@ -171,6 +177,17 @@ impl std::fmt::Display for SemanticError {
             }
             SemanticError::UnsupportedOperator { operator, position } => {
                 write!(f, "Unsuported operator found '{}'", operator)?;
+                if let Some(pos) = position {
+                    write!(f, " at line {}, column {}", pos.line, pos.column)?;
+                }
+                Ok(())
+            }
+            SemanticError::InvalidVariableDeclaration { name, position } => {
+                write!(
+                    f,
+                    "Variable cannot be created without type and initializer '{}'",
+                    name
+                )?;
                 if let Some(pos) = position {
                     write!(f, " at line {}, column {}", pos.line, pos.column)?;
                 }

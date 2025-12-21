@@ -24,10 +24,14 @@ where
                         let local_idx = self.get_or_create_local(name);
                         self.instructions().push(Instruction::StoreVar(local_idx));
                     } else {
-                        // TODO: support undefined initialization
-                        // let local_idx = self.get_or_create_local(name);
-                        // self.instructions().push(Instruction::PushUndefined);
-                        // self.instructions().push(Instruction::StoreVar(local_idx));
+                        if let Some(var_type) = &var.var_type {
+                            match Node::get_default_value(var_type) {
+                                Ok(node) => self.visit_node(&node),
+                                Err(e) => eprintln!("{}", e),
+                            }
+                        }
+                        let local_idx = self.get_or_create_local(name);
+                        self.instructions().push(Instruction::StoreVar(local_idx));
                     }
                 }
             }

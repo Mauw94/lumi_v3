@@ -1,4 +1,4 @@
-use lumi_bytecode::BytecodeGenerator;
+use lumi_bytecode::{BytecodeGenerator, Constant};
 use lumi_parser::Parser;
 
 #[test]
@@ -9,7 +9,7 @@ fn store_empty_variable_test() {
     let mut bytecode_generator = BytecodeGenerator::new();
     let bytecode = bytecode_generator.generate(&ast);
 
-    assert_eq!(bytecode.constants, vec![]); // No constants should be generated for an empty variable declaration
+    assert_eq!(bytecode.constants, vec![Constant::Number(0.0)]); // Default value for int should be in the constant pool.
 }
 
 #[test]
