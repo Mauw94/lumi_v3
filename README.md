@@ -4,7 +4,7 @@
 
 ---
 
-## 🌐 Project Overview
+## Project Overview
 
 Lumi is designed for:
 
@@ -15,7 +15,7 @@ Lumi is designed for:
 
 ---
 
-## 📦 Workspace Layout
+## Workspace Layout
 
 ```txt
 lumi_v3/
@@ -36,7 +36,7 @@ lumi_v3/
 
 ---
 
-## 🚀 High-Level Architecture
+## High-Level Architecture
 
 ``` text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -59,9 +59,9 @@ lumi_v3/
 
 ---
 
-## 📚 Component Overview
+## Component Overview
 
-### 🧠 `lumi_lexer` - Lexical Analysis
+### `lumi_lexer` - Lexical Analysis
 
 * **Input**: Source code string
 * **Output**: Stream of tokens
@@ -77,7 +77,7 @@ pub fn tokenize(source: &str) -> Result<Vec<Token>, LexError>
 
 ---
 
-### 🌲 `lumi_ast` - Abstract Syntax Tree
+### `lumi_ast` - Abstract Syntax Tree
 
 * **Input**: Token stream
 * **Output**: Tree-based program structure
@@ -93,7 +93,7 @@ pub trait Visitor { /* ... */ }
 
 ---
 
-### 📐 `lumi_parser` - Syntax Analysis
+### `lumi_parser` - Syntax Analysis
 
 * **Input**: Tokens
 * **Output**: AST
@@ -109,7 +109,7 @@ pub fn parse(tokens: &[Token]) -> ParseResult<Node>
 
 ---
 
-### 🔍 `lumi_semantic` - Semantic Analysis
+### `lumi_semantic` - Semantic Analysis
 
 * **Input**: AST
 * **Output**: Type-checked AST
@@ -125,7 +125,7 @@ pub fn analyze(ast: &Node) -> Result<(), Vec<SemanticError>>
 
 ---
 
-### ⚙️ `lumi_bytecode` - Bytecode Generation
+### `lumi_bytecode` - Bytecode Generation
 
 - **Input**: AST
 - **Output**: Lumi Bytecode
@@ -145,7 +145,7 @@ pub fn generate(ast: &Node) -> Bytecode
 
 ---
 
-### 🖥️ `lumi_vm` - Virtual Machine
+### `lumi_vm` - Virtual Machine
 
 - **Input**: Lumi Bytecode
 - **Output**: Runtime execution result
@@ -158,7 +158,7 @@ pub fn generate(ast: &Node) -> Bytecode
 pub fn execute(bytecode: &Bytecode) -> Result<Value, VMError>
 ```
 
-### 🧩 `lumi_runtime` - Runtime Environment
+### `lumi_runtime` - Runtime Environment
 
 - **Purpose**: Runtime environment and value system
 - **Features**:
@@ -166,7 +166,7 @@ pub fn execute(bytecode: &Bytecode) -> Result<Value, VMError>
   - Object and function models
   - Value representation for dynamic types
 
-## 📦 Dependencies
+## Dependencies
 
 Common crates used:
 
@@ -175,7 +175,7 @@ Common crates used:
 
 ---
 
-## 🛠 Build & Test
+## Build & Test
 
 ```bash
 # Check formatting
@@ -190,7 +190,7 @@ cargo test --all
 
 ---
 
-## 🧭 Roadmap
+## Roadmap
 
 * [x] Lexer                     
 * [x] Parser
@@ -205,6 +205,6 @@ cargo test --all
 🛠 Note: While the foundational crates (lumi_lexer, lumi_ast, lumi_parser, lumi_semantic, lumi_bytecode, lumi_vm and lumi_runtime) are implemented, they are actively under development. Functionality is expanding as Lumi evolves into a more expressive and capable language. Expect breaking changes, experimental features, and rapid iteration.
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
