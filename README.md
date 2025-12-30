@@ -202,7 +202,7 @@ cargo test --all
 * [x] Runtime
 * [ ] Public API
 
-🛠 Note: While the foundational crates (lumi_lexer, lumi_ast, lumi_parser, lumi_semantic, lumi_bytecode, lumi_vm and lumi_runtime) are implemented, they are actively under development. Functionality is expanding as Lumi evolves into a more expressive and capable language. Expect breaking changes, experimental features, and rapid iteration.
+Note: While the foundational crates (lumi_lexer, lumi_ast, lumi_parser, lumi_semantic, lumi_bytecode, lumi_vm and lumi_runtime) are implemented, they are actively under development. Functionality is expanding as Lumi evolves into a more expressive and capable language. Expect breaking changes, experimental features, and rapid iteration.
 ---
 
 ## License
