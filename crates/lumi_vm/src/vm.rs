@@ -232,18 +232,17 @@ impl Vm {
                         locals[i] = arg;
                     }
 
+                    // TODO: optimize by not cloning instructions/constants and instead just keep a reference to the function's bytecode.
                     let return_ip = self.ip + 1;
                     self.stack.push_frame(Frame {
                         return_ip,
                         arg_count: argc,
-                        base_pointer: 0, // NOTE: atm we don't use base_pointer since our functions don't live on the stack.
+                        base_pointer: 0,
                         return_instructions: self.instructions.clone(),
                         return_constants: self.constants.clone(),
                         locals: locals,
                     });
 
-                    // Set the instructions to the functions instructions chunk and start from 0 again.
-                    // The frame has a pointer and copy of the previous instruction set.
                     self.instructions = function.instructions.clone();
                     self.constants = function.constants.clone();
                     self.ip = 0;
